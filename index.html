@@ -1,1 +1,1101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghorib Smart - Platform Belajar Interaktif</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Phosphor Icons - Lightweight) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            /* Color Palette */
+            --primary: #0F5C4D;
+            --primary-dark: #08483D;
+            --primary-light: #E7F3F1;
+            --bg-main: #F8F7F2;
+            --surface: #FFFFFF;
+            --gold: #C9A227;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --success: #2E8B57;
+            --warning: #D89B27;
+            --error: #C94C4C;
+            --border: #E5E7EB;
 
+            /* Spacing */
+            --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; 
+            --sp-6: 24px; --sp-8: 32px; --sp-12: 48px; --sp-16: 64px;
+
+            /* Radius & Shadow */
+            --rad-sm: 8px; --rad-md: 16px; --rad-lg: 24px; --rad-full: 999px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            
+            /* Typography */
+            --font-ui: 'Inter', sans-serif;
+            --font-arab: 'Amiri', serif;
+            
+            /* Sidebar width */
+            --sidebar-width: 260px;
+        }
+
+        /* Resets & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-ui); background-color: var(--bg-main); color: var(--text-main); line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; outline: none; }
+        a { text-decoration: none; color: inherit; }
+        input, select { font-family: inherit; }
+        
+        /* Layout */
+        #app { display: flex; min-height: 100vh; overflow: hidden; }
+        #sidebar { display: none; width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); flex-direction: column; padding: var(--sp-6); z-index: 50; }
+        #main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; padding-bottom: 80px; } /* pb for mobile nav */
+        #bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: var(--sp-2) var(--sp-4); justify-content: space-between; z-index: 50; padding-bottom: env(safe-area-inset-bottom, 16px); }
+        
+        /* Views */
+        .view { display: none; animation: fadeIn 0.3s ease; padding: var(--sp-4); max-width: 800px; margin: 0 auto; width: 100%; }
+        .view.active { display: block; }
+        .fullscreen-view { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: var(--sp-6); text-align: center; background: var(--surface); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Typography */
+        h1 { font-size: 24px; font-weight: 700; margin-bottom: var(--sp-2); }
+        h2 { font-size: 20px; font-weight: 600; margin-bottom: var(--sp-2); }
+        h3 { font-size: 16px; font-weight: 600; }
+        p { color: var(--text-muted); margin-bottom: var(--sp-4); }
+        .text-arab { font-family: var(--font-arab); font-size: 32px; line-height: 2; direction: rtl; text-align: right; margin: var(--sp-6) 0; }
+        .highlight { color: var(--primary); font-weight: bold; }
+
+        /* Components */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: 12px 24px; border-radius: var(--rad-full); font-weight: 600; transition: all 0.2s; width: 100%; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:active { transform: scale(0.98); background: var(--primary-dark); }
+        .btn-secondary { background: var(--primary-light); color: var(--primary); }
+        .btn-outline { border: 1px solid var(--border); color: var(--text-main); }
+        
+        .card { background: var(--surface); border-radius: var(--rad-md); padding: var(--sp-4); box-shadow: var(--shadow-sm); margin-bottom: var(--sp-4); border: 1px solid var(--border); }
+        .card-primary { background: var(--primary); color: white; }
+        .card-primary p, .card-primary .text-muted { color: rgba(255,255,255,0.8); }
+
+        .input-group { margin-bottom: var(--sp-4); text-align: left; width: 100%; }
+        .input-group label { display: block; margin-bottom: var(--sp-2); font-weight: 500; font-size: 14px; }
+        .input-control { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: var(--rad-sm); font-size: 16px; transition: border 0.2s; }
+        .input-control:focus { border-color: var(--primary); outline: none; }
+        
+        .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+        .radio-card { border: 1px solid var(--border); border-radius: var(--rad-sm); padding: 14px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .radio-card.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+
+        /* Navigation */
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); color: var(--text-muted); font-size: 12px; padding: var(--sp-2); border-radius: var(--rad-sm); flex: 1; }
+        .nav-item i { font-size: 24px; }
+        .nav-item.active { color: var(--primary); font-weight: 600; }
+        
+        .sidebar-item { display: flex; align-items: center; gap: var(--sp-3); padding: 12px 16px; color: var(--text-muted); font-weight: 500; border-radius: var(--rad-sm); margin-bottom: var(--sp-2); transition: all 0.2s; }
+        .sidebar-item:hover { background: var(--bg-main); }
+        .sidebar-item.active { background: var(--primary-light); color: var(--primary); }
+        .sidebar-item i { font-size: 20px; }
+
+        /* Header / Avatar */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-6); padding-top: var(--sp-4); }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--primary); }
+
+        /* Progress Bar */
+        .progress-container { width: 100%; background: var(--border); border-radius: var(--rad-full); height: 8px; overflow: hidden; margin-top: var(--sp-2); }
+        .progress-bar { height: 100%; background: var(--primary); border-radius: var(--rad-full); transition: width 0.5s ease; }
+
+        /* Grid */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+        .quick-action { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-2); background: var(--surface); padding: var(--sp-4); border-radius: var(--rad-md); border: 1px solid var(--border); box-shadow: var(--shadow-sm); color: var(--text-main); font-weight: 500; font-size: 14px; }
+        .quick-action i { font-size: 32px; color: var(--primary); }
+
+        /* Material List & Tabs */
+        .tabs { display: flex; gap: var(--sp-2); overflow-x: auto; padding-bottom: var(--sp-2); margin-bottom: var(--sp-4); }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab { padding: 8px 16px; border-radius: var(--rad-full); background: var(--surface); border: 1px solid var(--border); font-size: 14px; white-space: nowrap; color: var(--text-muted); }
+        .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        .material-card { display: flex; align-items: center; gap: var(--sp-4); }
+        .material-num { width: 48px; height: 48px; border-radius: var(--rad-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; flex-shrink: 0; }
+        .material-info { flex: 1; }
+        .material-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: var(--sp-1); }
+        .status-badge { font-size: 10px; padding: 2px 8px; border-radius: var(--rad-full); background: var(--bg-main); color: var(--text-muted); }
+        .status-badge.selesai { background: #dcfce7; color: var(--success); }
+        .status-badge.sedang { background: #fef3c7; color: var(--warning); }
+
+        /* Audio Player Custom */
+        .audio-player { background: var(--primary-light); border-radius: var(--rad-md); padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-3); margin: var(--sp-4) 0; }
+        .audio-controls { display: flex; align-items: center; gap: var(--sp-3); }
+        .play-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+        .track-info { flex: 1; }
+        .time-display { font-size: 12px; color: var(--primary-dark); display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .custom-slider { -webkit-appearance: none; width: 100%; height: 6px; background: rgba(15, 92, 77, 0.2); border-radius: 4px; outline: none; }
+        .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+
+        /* Quiz */
+        .quiz-option { padding: 16px; border: 2px solid var(--border); border-radius: var(--rad-md); margin-bottom: var(--sp-3); cursor: pointer; transition: all 0.2s; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+        .quiz-option.selected { border-color: var(--primary); background: var(--primary-light); }
+        .quiz-option.correct { border-color: var(--success); background: #dcfce7; }
+        .quiz-option.wrong { border-color: var(--error); background: #fee2e2; }
+        
+        /* Mascot & Welcome */
+        .mascot-container { width: 200px; height: 200px; margin: 0 auto var(--sp-6); background: var(--primary-light); border-radius: 50%; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .mascot-container img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Desktop Adjustments */
+        @media (min-width: 1024px) {
+            #bottom-nav { display: none; }
+            #sidebar { display: flex; }
+            #main-content { padding-bottom: 0; }
+            .view { padding: var(--sp-8); max-width: 900px; margin: 0; }
+            .desktop-2-col { display: grid; grid-template-columns: 2fr 1fr; gap: var(--sp-8); align-items: start; }
+            .sticky-panel { position: sticky; top: var(--sp-8); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Sidebar (Desktop) -->
+    <nav id="sidebar">
+        <div style="margin-bottom: 32px; font-weight: bold; font-size: 20px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+            <i class="ph-fill ph-book-open-text"></i> GHORIB SMART
+        </div>
+        <div class="sidebar-links">
+            <!-- Populated via JS -->
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <!-- Render Container -->
+    </main>
+
+    <!-- Bottom Nav (Mobile) -->
+    <nav id="bottom-nav">
+        <!-- Populated via JS -->
+    </nav>
+</div>
+
+<script>
+    // ==========================================
+    // 1. DATA STRUCTURE & RESOURCES
+    // ==========================================
+    const MATERIALS = [
+        {
+            id: 1, title: 'Imalah', surat: 'Surat Hud', ayat: '41', juz: '12',
+            desc: 'Imalah secara bahasa berarti condong. Secara istilah berarti mencondongkan fathah kepada kasrah dan mencondongkan alif kepada ya. Di dalam Al-Qur\'an riwayat Hafsh hanya terdapat pada satu tempat.',
+            arabic: 'بِسْمِ ٱللَّهِ <span class="highlight">مَجْرٜىٰهَا</span> وَمُرْسَىٰهَآ',
+            audio: 'bacaan 1.m4a'
+        },
+        {
+            id: 2, title: 'Isymam', surat: 'Surat Yusuf', ayat: '11', juz: '12',
+            desc: 'Isymam adalah mencampurkan dhommah pada sukun dengan memoncongkan bibir. [ASSUMPTION: Detail penjelasan merujuk pada DOCX materi].',
+            arabic: 'قَالُوا۟ يَـٰٓأَبَانَا مَا لَكَ <span class="highlight">لَا تَأْمَ۫نَّا</span> عَلَىٰ يُوسُفَ',
+            audio: 'bacaan 2.m4a'
+        },
+        {
+            id: 3, title: 'Saktah', surat: 'Beberapa Tempat', ayat: '-', juz: '-',
+            desc: 'Saktah adalah berhenti sejenak tanpa bernapas selama kurang lebih 2 harakat. Terdapat di 4 tempat utama dalam Al-Qur\'an (Al-Kahfi, Yasin, Al-Qiyamah, Al-Mutaffifin). [ASSUMPTION: Penjelasan dari DOCX].',
+            arabic: 'عِوَجَاۜ ۝ قَيِّمًا',
+            audio: 'bacaan 3.m4a'
+        },
+        {
+            id: 4, title: 'Tashil', surat: 'Fussilat', ayat: '44', juz: '24',
+            desc: 'Tashil adalah membaca antara hamzah dan alif (meringankan bacaan hamzah kedua). [ASSUMPTION: Penjelasan dari DOCX].',
+            arabic: '<span class="highlight">ءَا۬عْجَمِىٌّ</span> وَعَرَبِىٌّ',
+            audio: 'bacaan 4.m4a'
+        },
+        {
+            id: 5, title: 'Naql', surat: 'Al-Hujurat', ayat: '11', juz: '26',
+            desc: 'Naql adalah memindahkan harakat hamzah ke huruf mati sebelumnya. Dalam Al-Qur\'an hanya ada satu lafaz. [ASSUMPTION: Penjelasan dari DOCX].',
+            arabic: '<span class="highlight">بِئْسَ ٱلِٱسْمُ</span> ٱلْفُسُوقُ',
+            audio: 'bacaan 5.m4a'
+        },
+        {
+            id: 6, title: 'Mad Badal', surat: 'Umum', ayat: '-', juz: '-',
+            desc: '[ASSUMPTION: Penjelasan Mad Badal Ghorib dari DOCX].',
+            arabic: '<span class="highlight">ءَامَنُوا۟</span>',
+            audio: 'bacaan 6.m4a'
+        },
+        {
+            id: 7, title: 'Shaad dibaca Sin', surat: 'Al-Baqarah', ayat: '245', juz: '2',
+            desc: 'Huruf Shaad (ص) yang tertulis, namun dibaca dengan huruf Sin (س). [ASSUMPTION: Penjelasan dari DOCX].',
+            arabic: 'وَٱللَّهُ يَقْبِضُ <span class="highlight">وَيَبْصُۜطُ</span>',
+            audio: 'bacaan 7.m4a'
+        },
+        {
+            id: 8, title: 'Idgham Mutajanisain', surat: 'Hud', ayat: '42', juz: '12',
+            desc: 'Pertemuan huruf Ba\' sukun dengan Mim. [ASSUMPTION: Penjelasan dari DOCX].',
+            arabic: 'يَـٰبُنَىَّ <span class="highlight">ٱرْكَب مَّعَنَا</span>',
+            audio: 'bacaan 8.m4a'
+        },
+        {
+            id: 9, title: 'Waqaf/Washal', surat: 'Al-Insan', ayat: '15', juz: '29',
+            desc: 'Aturan bacaan Waqaf dan Washal pada contoh pertama. [ASSUMPTION: Penjelasan spesifik DOCX].',
+            arabic: 'أَكْوَابٍ كَانَتْ <span class="highlight">قَوَارِيرَا۠</span>',
+            audio: 'bacaan 9.m4a'
+        },
+        {
+            id: 10, title: 'Qawarira (Ayat 16)', surat: 'Al-Insan', ayat: '16', juz: '29',
+            desc: 'Aturan bacaan kata Qawarira pada ayat kedua (16). [ASSUMPTION: Penjelasan spesifik DOCX].',
+            arabic: '<span class="highlight">قَوَارِيرَا۟</span> مِن فِضَّةٍ',
+            audio: 'bacaan 10.m4a'
+        },
+        {
+            id: 11, title: 'Salasila', surat: 'Al-Insan', ayat: '4', juz: '29',
+            desc: 'Aturan bacaan kata Salasila ketika waqaf dan washal. [ASSUMPTION: Penjelasan dari DOCX].',
+            arabic: 'إِنَّآ أَعْتَدْنَا لِلْكَـٰفِرِينَ <span class="highlight">سَلَـٰسِلَا۟</span>',
+            audio: 'bacaan 11.m4a'
+        },
+        {
+            id: 12, title: 'Contoh Al-\'Ankabut', surat: 'Al-Ankabut', ayat: '-', juz: '20',
+            desc: 'Bacaan khusus pada surat Al-Ankabut. [ASSUMPTION: Penjelasan dan ayat dari DOCX].',
+            arabic: '[ASSUMPTION: LAFAZ ARAB DARI DOCX]',
+            audio: 'bacaan 12.m4a'
+        },
+        {
+            id: 13, title: 'مَثَلًا الْحَمْدُ لِلَّهِ', surat: 'Az-Zumar', ayat: '29', juz: '23',
+            desc: 'Bacaan khusus terkait pertemuan lafaz tersebut. [ASSUMPTION: Penjelasan rinci dari DOCX].',
+            arabic: 'ضَرَبَ ٱللَّهُ <span class="highlight">مَثَلًا رَّجُلًا ... ٱلْحَمْدُ لِلَّهِ</span>',
+            audio: 'bacaan 13.m4a'
+        }
+    ];
+
+    const QUIZ_QUESTIONS = [
+        { q: 'Hukum bacaan mencondongkan fathah ke kasrah disebut?', options: ['Isymam', 'Imalah', 'Tashil', 'Saktah'], ans: 1, exp: 'Imalah berarti mencondongkan secara bahasa.' },
+        { q: 'Lafaz لَا تَأْمَنَّا pada surat Yusuf merupakan contoh bacaan?', options: ['Naql', 'Imalah', 'Isymam', 'Saktah'], ans: 2, exp: 'Isymam adalah memoncongkan bibir pada lafaz tersebut.' },
+        { q: 'Berhenti sejenak tanpa mengambil napas disebut?', options: ['Waqaf', 'Washal', 'Saktah', 'Tashil'], ans: 2, exp: 'Itu adalah definisi dasar dari Saktah.' },
+        { q: 'Lafaz ءَاعْجَمِيٌّ dalam surat Fussilat dibaca dengan?', options: ['Tashil', 'Naql', 'Isymam', 'Mad Badal'], ans: 0, exp: 'Hamzah kedua dibaca antara hamzah dan alif.' }
+    ];
+
+    const NAV_ITEMS = [
+        { id: 'home', icon: 'ph-house', label: 'Home' },
+        { id: 'materials', icon: 'ph-book-open', label: 'Materi' },
+        { id: 'audio', icon: 'ph-headphones', label: 'Audio' },
+        { id: 'quiz', icon: 'ph-exam', label: 'Latihan' },
+        { id: 'progress', icon: 'ph-chart-pie-slice', label: 'Progress' }
+    ];
+
+    // ==========================================
+    // 2. STATE & STORAGE MANAGEMENT
+    // ==========================================
+    const Storage = {
+        get: (key) => JSON.parse(localStorage.getItem(`ghorib_${key}`)) || null,
+        set: (key, val) => localStorage.setItem(`ghorib_${key}`, JSON.stringify(val)),
+        remove: (key) => localStorage.removeItem(`ghorib_${key}`)
+    };
+
+    let AppState = {
+        user: Storage.get('user') || null, // { name, gender, isLoggedIn }
+        progress: Storage.get('progress') || {
+            completed: [], // array of material IDs
+            inProgress: [], // array of material IDs
+            quizScores: [],
+            lastMaterial: null
+        },
+        currentAudioNode: null,
+        currentAudioPlayer: null
+    };
+
+    function saveProgress() {
+        Storage.set('progress', AppState.progress);
+    }
+
+    // ==========================================
+    // 3. CORE ROUTING & RENDER ENGINE
+    // ==========================================
+    const mainContent = document.getElementById('main-content');
+    const bottomNav = document.getElementById('bottom-nav');
+    const sidebarContainer = document.querySelector('#sidebar .sidebar-links');
+
+    function navigate(viewId, params = null) {
+        window.scrollTo(0, 0);
+        stopAudio(); // Exclusive audio rule
+        renderNavigation(viewId);
+        
+        mainContent.innerHTML = ''; // Clear current view
+        
+        const viewWrapper = document.createElement('div');
+        viewWrapper.className = `view active ${['splash','onboarding','identity','login','welcome'].includes(viewId) ? 'fullscreen-view' : ''}`;
+        
+        // Router Mapping
+        const viewRenderers = {
+            'splash': renderSplash,
+            'onboarding': renderOnboarding,
+            'identity': renderIdentity,
+            'login': renderLogin,
+            'welcome': renderWelcome,
+            'home': renderHome,
+            'materials': renderMaterialList,
+            'material-detail': () => renderMaterialDetail(params),
+            'audio': renderAudioLibrary,
+            'quiz': renderQuizIntro,
+            'quiz-run': renderQuizRun,
+            'quiz-result': () => renderQuizResult(params),
+            'progress': renderProgressPage,
+            'profile': renderProfile,
+            'settings': renderSettings
+        };
+
+        if(viewRenderers[viewId]) {
+            viewWrapper.innerHTML = viewRenderers[viewId]();
+            mainContent.appendChild(viewWrapper);
+            attachViewListeners(viewId, viewWrapper, params);
+        }
+    }
+
+    function renderNavigation(activeId) {
+        // Hide nav on auth/intro screens
+        const noNavScreens = ['splash', 'onboarding', 'identity', 'login', 'welcome'];
+        if (noNavScreens.includes(activeId)) {
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('bottom-nav').style.display = 'none';
+            return;
+        } else {
+            // Restore display based on CSS media queries. Inline style cleanup.
+            document.getElementById('sidebar').style.display = window.innerWidth >= 1024 ? 'flex' : 'none';
+            document.getElementById('bottom-nav').style.display = window.innerWidth < 1024 ? 'flex' : 'none';
+        }
+
+        const buildNav = (isSidebar) => NAV_ITEMS.map(item => `
+            <a href="#" onclick="navigate('${item.id}'); return false;" class="${isSidebar ? 'sidebar-item' : 'nav-item'} ${item.id === activeId ? 'active' : ''}">
+                <i class="${item.icon} ${item.id === activeId ? 'ph-fill' : ''}"></i>
+                ${isSidebar ? item.label : `<span>${item.label}</span>`}
+            </a>
+        `).join('') + (isSidebar ? `
+            <hr style="border-top:1px solid var(--border); margin:16px 0;">
+            <a href="#" onclick="navigate('profile'); return false;" class="sidebar-item ${activeId === 'profile' ? 'active' : ''}"><i class="ph-user"></i> Profil</a>
+            <a href="#" onclick="navigate('settings'); return false;" class="sidebar-item ${activeId === 'settings' ? 'active' : ''}"><i class="ph-gear"></i> Pengaturan</a>
+        ` : '');
+
+        bottomNav.innerHTML = buildNav(false);
+        sidebarContainer.innerHTML = buildNav(true);
+    }
+
+    // ==========================================
+    // 4. AUDIO CONTROLLER
+    // ==========================================
+    function stopAudio() {
+        if(AppState.currentAudioNode) {
+            AppState.currentAudioNode.pause();
+            if(AppState.currentAudioPlayer) {
+                AppState.currentAudioPlayer.querySelector('.play-btn i').className = 'ph-fill ph-play';
+            }
+            AppState.currentAudioNode = null;
+            AppState.currentAudioPlayer = null;
+        }
+    }
+
+    function toggleAudio(src, playerContainer) {
+        const icon = playerContainer.querySelector('.play-btn i');
+        const progressBar = playerContainer.querySelector('.custom-slider');
+        const timeDisplay = playerContainer.querySelector('.current-time');
+        
+        // If clicking same audio that is playing -> pause
+        if(AppState.currentAudioNode && AppState.currentAudioNode.src.endsWith(src) && !AppState.currentAudioNode.paused) {
+            AppState.currentAudioNode.pause();
+            icon.className = 'ph-fill ph-play';
+            return;
+        }
+
+        // Exclusivity: stop any playing audio
+        stopAudio();
+
+        // Create new or play existing
+        if(!AppState.currentAudioNode || !AppState.currentAudioNode.src.endsWith(src)) {
+            // Note: Since this is purely frontend without server assets, audio playback will error out gracefully.
+            AppState.currentAudioNode = new Audio(`assets/${src}`); 
+            AppState.currentAudioNode.onerror = () => {
+                alert('Audio belum dapat diputar. Periksa file audio atau coba lagi.');
+                icon.className = 'ph-fill ph-play';
+            };
+        }
+        
+        AppState.currentAudioPlayer = playerContainer;
+        icon.className = 'ph-fill ph-pause';
+        
+        // Handle playback (Catch exception for missing local files in prototype)
+        AppState.currentAudioNode.play().catch(e => {
+            console.log("Audio file missing or blocked:", e);
+            alert(`File audio '${src}' tidak ditemukan di prototype ini.`);
+            icon.className = 'ph-fill ph-play';
+        });
+
+        // Time updates
+        AppState.currentAudioNode.ontimeupdate = () => {
+            const ratio = AppState.currentAudioNode.currentTime / AppState.currentAudioNode.duration;
+            progressBar.value = ratio ? ratio * 100 : 0;
+            timeDisplay.innerText = formatTime(AppState.currentAudioNode.currentTime);
+        };
+        
+        AppState.currentAudioNode.onended = () => {
+            icon.className = 'ph-fill ph-play';
+            progressBar.value = 0;
+            timeDisplay.innerText = "0:00";
+        };
+    }
+
+    function formatTime(seconds) {
+        if(isNaN(seconds)) return "0:00";
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `${m}:${s < 10 ? '0' + s : s}`;
+    }
+
+    function renderAudioPlayer(src, title) {
+        return `
+        <div class="audio-player" data-src="${src}">
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio('${src}', this.parentElement.parentElement)"><i class="ph-fill ph-play"></i></button>
+                <div class="track-info">
+                    <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${title}</div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span class="total-time">--:--</span>
+                    </div>
+                    <input type="range" class="custom-slider" value="0" min="0" max="100" readonly>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    // ==========================================
+    // 5. VIEW RENDERERS & LOGIC
+    // ==========================================
+
+    /* --- AUTH & ONBOARDING --- */
+    function renderSplash() {
+        setTimeout(() => {
+            if(AppState.user && AppState.user.isLoggedIn) navigate('home');
+            else navigate('onboarding');
+        }, 2000);
+        return `
+            <i class="ph-fill ph-book-open-text" style="font-size: 64px; color: var(--primary); margin-bottom: 16px;"></i>
+            <h1 style="color: var(--primary);">GHORIB SMART</h1>
+            <p>Platform Edukasi Interaktif Al-Qur'an</p>
+        `;
+    }
+
+    function renderOnboarding() {
+        return `
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23E7F3F1'/><text x='50' y='60' font-size='40' text-anchor='middle' fill='%230F5C4D'>📖</text></svg>" width="200" style="margin-bottom:32px;">
+            <h1>Selamat Datang di GHORIB SMART</h1>
+            <p>Temukan cara belajar bacaan Ghorib yang lebih modern, interaktif, dan mudah dipahami.</p>
+            <button class="btn btn-primary" style="margin-top:24px;" onclick="navigate('identity')">Mulai Sekarang</button>
+        `;
+    }
+
+    function renderIdentity() {
+        return `
+            <div style="text-align:left; width:100%; max-width:400px; margin: 0 auto;">
+                <h2>Profil Anda</h2>
+                <p>Mari berkenalan sebelum mulai belajar.</p>
+                <div class="input-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="inp-name" class="input-control" placeholder="Masukkan nama Anda">
+                </div>
+                <div class="input-group">
+                    <label>Jenis Kelamin</label>
+                    <div class="radio-group" id="gender-group">
+                        <div class="radio-card" data-val="L"><i class="ph-gender-male" style="font-size:24px; margin-bottom:8px;"></i><br>Laki-laki</div>
+                        <div class="radio-card" data-val="P"><i class="ph-gender-female" style="font-size:24px; margin-bottom:8px;"></i><br>Perempuan</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:24px;" id="btn-save-identity">Lanjutkan</button>
+            </div>
+        `;
+    }
+
+    function renderLogin() {
+        return `
+            <div style="text-align:left; width:100%; max-width:400px; margin: 0 auto;">
+                <h2>Masuk Akun</h2>
+                <p>Gunakan kredensial Anda untuk melanjutkan.</p>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" class="input-control" value="user@example.com" readonly style="background:#f3f4f6; color:#9ca3af;">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" class="input-control" value="password123" readonly style="background:#f3f4f6; color:#9ca3af;">
+                </div>
+                <div style="text-align:right; margin-bottom:24px; font-size:14px; color:var(--primary);">Lupa kata sandi?</div>
+                <button class="btn btn-primary" onclick="doLogin()">Masuk</button>
+            </div>
+        `;
+    }
+
+    function renderWelcome() {
+        const gender = AppState.user.gender;
+        const mascot = gender === 'P' ? 'maskot cewe' : 'maskot cowo';
+        
+        setTimeout(() => {
+            navigate('home');
+        }, 5000); // Auto skip after 5s
+
+        // Using placeholder colored div for GIF since real files aren't present
+        return `
+            <div class="mascot-container">
+                <div style="width:100%; height:100%; background:var(--primary-light); display:flex; align-items:center; justify-content:center; color:var(--primary); font-weight:bold;">
+                    [${mascot}.gif]
+                </div>
+            </div>
+            <h2>Assalamu'alaikum, ${AppState.user.name.split(' ')[0]}!</h2>
+            <p>Selamat datang di pembelajaran Ghorib.</p>
+            
+            <div style="margin-top: 32px; display:flex; flex-direction:column; gap:16px; align-items:center;">
+                <button class="btn btn-outline" style="width:auto;" onclick="playWelcomeAudio('${mascot}.mp3')">
+                    <i class="ph-fill ph-speaker-high"></i> Putar Sambutan
+                </button>
+                <button class="btn btn-secondary" style="width:auto;" onclick="navigate('home')">Lewati</button>
+            </div>
+        `;
+    }
+
+    function doLogin() {
+        AppState.user.isLoggedIn = true;
+        Storage.set('user', AppState.user);
+        navigate('welcome');
+    }
+
+    function playWelcomeAudio(file) {
+        alert(`Memutar audio sambutan: ${file}`);
+        // let a = new Audio('assets/' + file); a.play();
+    }
+
+    /* --- HOME DASHBOARD --- */
+    function renderHome() {
+        const user = AppState.user;
+        const p = AppState.progress;
+        const pct = MATERIALS.length > 0 ? Math.round((p.completed.length / MATERIALS.length) * 100) : 0;
+        
+        let lastMatObj = MATERIALS.find(m => m.id === p.lastMaterial) || MATERIALS[0];
+        
+        return `
+            <div class="header">
+                <div>
+                    <p style="margin:0; font-size:14px;">Assalamu'alaikum,</p>
+                    <h2 style="margin:0;">${user.name.split(' ')[0]} 👋</h2>
+                </div>
+                <div class="avatar" onclick="navigate('profile')">${user.name.charAt(0).toUpperCase()}</div>
+            </div>
+
+            <div class="card card-primary" style="margin-bottom: 24px;">
+                <h3>Pelajari Bacaan Ghorib Lebih Mudah</h3>
+                <p style="margin-top: 8px; font-size: 14px; margin-bottom: 16px;">Pahami bacaan khusus dalam Al-Qur'an melalui materi terstruktur dan audio pelafalan.</p>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" style="background:white; color:var(--primary); width:auto; padding:8px 16px; font-size:14px;" onclick="navigate('materials')">Mulai Belajar</button>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 16px;">Progress Belajar</h3>
+            <div class="card" onclick="navigate('progress')" style="cursor:pointer;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="font-weight:600; font-size:14px;">${p.completed.length} / ${MATERIALS.length} Materi selesai</span>
+                    <span style="color:var(--primary); font-weight:bold;">${pct}%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: ${pct}%;"></div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 24px; margin-bottom: 16px;">Lanjutkan Pembelajaran</h3>
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+                <div>
+                    <div class="status-badge sedang" style="display:inline-block; margin-bottom:8px;">Materi ${lastMatObj.id < 10 ? '0'+lastMatObj.id : lastMatObj.id}</div>
+                    <h3 style="margin:0;">${lastMatObj.title}</h3>
+                    <p style="font-size:13px; margin-top:4px; margin-bottom:0;">Pelajari cara membaca lafaz khusus ini dengan benar.</p>
+                </div>
+                <button class="btn btn-outline" style="font-size:14px; padding:8px;" onclick="navigate('material-detail', ${lastMatObj.id})">
+                    <i class="ph-play"></i> Lanjutkan
+                </button>
+            </div>
+
+            <h3 style="margin-top: 24px; margin-bottom: 16px;">Akses Cepat</h3>
+            <div class="grid-2" style="margin-bottom:32px;">
+                <div class="quick-action" onclick="navigate('materials')">
+                    <i class="ph-book-open"></i> Materi
+                </div>
+                <div class="quick-action" onclick="navigate('audio')">
+                    <i class="ph-headphones"></i> Audio
+                </div>
+                <div class="quick-action" onclick="navigate('quiz')">
+                    <i class="ph-exam"></i> Latihan
+                </div>
+                <div class="quick-action" onclick="navigate('progress')">
+                    <i class="ph-chart-bar"></i> Progress
+                </div>
+            </div>
+        `;
+    }
+
+    /* --- MATERIALS --- */
+    function renderMaterialList() {
+        return `
+            <h2>Bacaan Ghorib</h2>
+            <p>13 Materi Pembelajaran</p>
+
+            <div class="input-group" style="position:relative;">
+                <i class="ph-magnifying-glass" style="position:absolute; left:12px; top:14px; color:var(--text-muted); font-size:20px;"></i>
+                <input type="text" id="search-mat" class="input-control" placeholder="Cari materi..." style="padding-left:40px;" onkeyup="filterMaterials()">
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-filter="all" onclick="setTab(this)">Semua</div>
+                <div class="tab" data-filter="not" onclick="setTab(this)">Belum dipelajari</div>
+                <div class="tab" data-filter="prog" onclick="setTab(this)">Sedang dipelajari</div>
+                <div class="tab" data-filter="done" onclick="setTab(this)">Selesai</div>
+            </div>
+
+            <div id="material-list-container">
+                <!-- Injected via JS -->
+            </div>
+        `;
+    }
+
+    function buildMaterialCards(filterMode = 'all', searchQuery = '') {
+        let html = '';
+        const p = AppState.progress;
+
+        let filtered = MATERIALS.filter(m => {
+            const matchesSearch = m.title.toLowerCase().includes(searchQuery.toLowerCase()) || m.surat.toLowerCase().includes(searchQuery.toLowerCase());
+            if(!matchesSearch) return false;
+
+            const isDone = p.completed.includes(m.id);
+            const isProg = p.inProgress.includes(m.id);
+            
+            if(filterMode === 'done') return isDone;
+            if(filterMode === 'prog') return isProg && !isDone;
+            if(filterMode === 'not') return !isDone && !isProg;
+            return true;
+        });
+
+        if(filtered.length === 0) {
+            return `
+                <div style="text-align:center; padding: 48px 0; color:var(--text-muted);">
+                    <i class="ph-folder-open" style="font-size:48px; margin-bottom:16px;"></i>
+                    <p>Tidak ada materi yang ditemukan.</p>
+                </div>
+            `;
+        }
+
+        filtered.forEach(m => {
+            let status = 'Belum dipelajari';
+            let badgeClass = '';
+            if(p.completed.includes(m.id)) { status = 'Selesai ✓'; badgeClass = 'selesai'; }
+            else if(p.inProgress.includes(m.id)) { status = 'Sedang dipelajari'; badgeClass = 'sedang'; }
+
+            html += `
+                <div class="card material-card" onclick="navigate('material-detail', ${m.id})" style="cursor:pointer;">
+                    <div class="material-num">${m.id < 10 ? '0'+m.id : m.id}</div>
+                    <div class="material-info">
+                        <h3 style="margin:0;">${m.title}</h3>
+                        <div style="font-size:13px; color:var(--text-muted); margin-top:2px;">${m.surat}: ${m.ayat}</div>
+                        <div class="material-meta">
+                            <span class="status-badge ${badgeClass}">${status}</span>
+                            <span style="color:var(--primary); font-weight:600;">Pelajari <i class="ph-caret-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        return html;
+    }
+
+    function renderMaterialDetail(id) {
+        const mat = MATERIALS.find(m => m.id === id);
+        if(!mat) return `<p>Materi tidak ditemukan.</p><button class="btn btn-primary" onclick="navigate('materials')">Kembali</button>`;
+        
+        // Update state
+        if(!AppState.progress.inProgress.includes(id) && !AppState.progress.completed.includes(id)) {
+            AppState.progress.inProgress.push(id);
+        }
+        AppState.progress.lastMaterial = id;
+        saveProgress();
+
+        const isDone = AppState.progress.completed.includes(id);
+
+        return `
+            <button class="btn btn-outline" style="width:auto; padding:8px 16px; margin-bottom:24px; font-size:14px;" onclick="navigate('materials')">
+                <i class="ph-arrow-left"></i> Kembali
+            </button>
+            
+            <div class="desktop-2-col">
+                <div class="main-panel">
+                    <div style="font-size:12px; font-weight:600; color:var(--primary); letter-spacing:1px; margin-bottom:8px;">MATERI ${mat.id < 10 ? '0'+mat.id : mat.id}</div>
+                    <h1 style="font-size:28px; margin-bottom:8px;">${mat.title}</h1>
+                    <div style="display:flex; gap:16px; font-size:14px; color:var(--text-muted); margin-bottom:32px;">
+                        <span><i class="ph-book-bookmark"></i> ${mat.surat} Ayat ${mat.ayat}</span>
+                        <span><i class="ph-books"></i> Juz ${mat.juz}</span>
+                    </div>
+
+                    <h3 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;">A. DEFINISI & PENJELASAN</h3>
+                    <p style="color:var(--text-main);">${mat.desc}</p>
+
+                    <h3 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px; margin-top:32px;">B. CONTOH AYAT</h3>
+                    <div class="card" style="background:white; text-align:center; padding:32px 16px;">
+                        <div class="text-arab">${mat.arabic}</div>
+                    </div>
+                </div>
+
+                <div class="sticky-panel">
+                    <h3 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;">C. AUDIO BACAAN</h3>
+                    ${renderAudioPlayer(mat.audio, `Contoh Pelafalan ${mat.title}`)}
+                    <p style="font-size:12px; margin-top:-8px;">Dengarkan dengan seksama bagaimana pelafalan bacaan Ghorib ini dipraktikkan.</p>
+                    
+                    <div style="margin-top:32px;">
+                        <button id="btn-complete-mat" class="btn ${isDone ? 'btn-outline' : 'btn-primary'}" onclick="markMaterialComplete(${mat.id})">
+                            ${isDone ? '<i class="ph-check-circle" style="color:var(--success)"></i> Selesai Dipelajari' : 'Saya Sudah Memahami'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function markMaterialComplete(id) {
+        if(!AppState.progress.completed.includes(id)) {
+            AppState.progress.completed.push(id);
+            // Remove from inProgress
+            AppState.progress.inProgress = AppState.progress.inProgress.filter(x => x !== id);
+            saveProgress();
+            const btn = document.getElementById('btn-complete-mat');
+            btn.className = 'btn btn-outline';
+            btn.innerHTML = '<i class="ph-check-circle" style="color:var(--success)"></i> Selesai Dipelajari';
+        }
+    }
+
+    /* --- AUDIO LIBRARY --- */
+    function renderAudioLibrary() {
+        let html = `
+            <h2>Audio Bacaan Ghorib</h2>
+            <p>Daftar lengkap audio pelafalan untuk seluruh materi.</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:24px;">
+        `;
+        MATERIALS.forEach(m => {
+            html += renderAudioPlayer(m.audio, `${m.id < 10 ? '0'+m.id : m.id} - ${m.title}`);
+        });
+        html += `</div>`;
+        return html;
+    }
+
+    /* --- QUIZ --- */
+    function renderQuizIntro() {
+        return `
+            <div class="fullscreen-view" style="position:static; min-height:auto; background:transparent;">
+                <i class="ph-exam" style="font-size:64px; color:var(--primary); margin-bottom:16px;"></i>
+                <h2>Latihan Pemahaman</h2>
+                <p>Uji sejauh mana Anda memahami 13 materi Ghorib Al-Qur'an.</p>
+                
+                <div class="card" style="text-align:left; max-width:400px; margin: 24px auto;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;"><span>Total Pertanyaan:</span> <b>${QUIZ_QUESTIONS.length} Soal</b></div>
+                    <div style="display:flex; justify-content:space-between; font-size:14px;"><span>Syarat Lulus:</span> <b>70%</b></div>
+                </div>
+
+                <button class="btn btn-primary" style="max-width:300px;" onclick="startQuiz()">Mulai Latihan</button>
+            </div>
+        `;
+    }
+
+    let quizState = { currentIdx: 0, score: 0, answers: [] };
+    function startQuiz() {
+        quizState = { currentIdx: 0, score: 0, answers: [] };
+        navigate('quiz-run');
+    }
+
+    function renderQuizRun() {
+        const q = QUIZ_QUESTIONS[quizState.currentIdx];
+        const pct = ((quizState.currentIdx) / QUIZ_QUESTIONS.length) * 100;
+        
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <span style="font-weight:600; font-size:14px; color:var(--text-muted);">Pertanyaan ${quizState.currentIdx + 1} dari ${QUIZ_QUESTIONS.length}</span>
+            </div>
+            <div class="progress-container" style="margin-bottom:32px;">
+                <div class="progress-bar" style="width: ${pct}%;"></div>
+            </div>
+
+            <h2 style="margin-bottom:32px; font-size:22px; line-height:1.4;">${q.q}</h2>
+            
+            <div id="quiz-options">
+        `;
+        q.options.forEach((opt, idx) => {
+            html += `<div class="quiz-option" onclick="selectQuizAnswer(${idx})">${String.fromCharCode(65+idx)}. ${opt}</div>`;
+        });
+        
+        html += `
+            </div>
+            <button id="btn-next-quiz" class="btn btn-primary" style="margin-top:32px; opacity:0.5; pointer-events:none;" onclick="nextQuizQuestion()">Lanjutkan</button>
+        `;
+        return html;
+    }
+
+    function selectQuizAnswer(idx) {
+        document.querySelectorAll('.quiz-option').forEach(el => el.classList.remove('selected'));
+        document.querySelectorAll('.quiz-option')[idx].classList.add('selected');
+        quizState.selected = idx;
+        const btn = document.getElementById('btn-next-quiz');
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+    }
+
+    function nextQuizQuestion() {
+        quizState.answers.push(quizState.selected);
+        if(quizState.selected === QUIZ_QUESTIONS[quizState.currentIdx].ans) quizState.score++;
+        
+        quizState.currentIdx++;
+        if(quizState.currentIdx >= QUIZ_QUESTIONS.length) {
+            finishQuiz();
+        } else {
+            navigate('quiz-run');
+        }
+    }
+
+    function finishQuiz() {
+        const finalPct = Math.round((quizState.score / QUIZ_QUESTIONS.length) * 100);
+        AppState.progress.quizScores.push(finalPct);
+        saveProgress();
+        navigate('quiz-result', { score: quizState.score, pct: finalPct });
+    }
+
+    function renderQuizResult(params) {
+        let isPass = params.pct >= 70;
+        let html = `
+            <div class="fullscreen-view" style="position:static; min-height:auto; background:transparent;">
+                <h1 style="font-size:48px; margin-bottom:0;">${isPass ? '🎉' : '📚'}</h1>
+                <h2 style="margin-top:16px;">Latihan Selesai</h2>
+                
+                <div style="font-size:64px; font-weight:bold; color:${isPass ? 'var(--success)' : 'var(--warning)'}; margin:24px 0;">${params.pct}%</div>
+                <p style="font-size:16px;">Anda menjawab benar ${params.score} dari ${QUIZ_QUESTIONS.length} pertanyaan.</p>
+                <p style="font-weight:600;">${isPass ? 'Bagus! Anda telah memahami sebagian besar materi.' : 'Terus semangat! Ulangi materi untuk hasil yang lebih baik.'}</p>
+                
+                <div style="display:flex; flex-direction:column; gap:16px; width:100%; max-width:300px; margin: 32px auto 0;">
+                    <button class="btn btn-primary" onclick="togglePembahasan()">Lihat Pembahasan</button>
+                    <button class="btn btn-outline" onclick="startQuiz()">Ulangi Latihan</button>
+                    <button class="btn btn-secondary" onclick="navigate('home')">Kembali ke Home</button>
+                </div>
+            </div>
+            
+            <div id="pembahasan-panel" style="display:none; margin-top:48px; border-top:1px solid var(--border); padding-top:32px;">
+                <h3>Pembahasan</h3>
+        `;
+        
+        QUIZ_QUESTIONS.forEach((q, i) => {
+            let uAns = quizState.answers[i];
+            let isCorr = uAns === q.ans;
+            html += `
+                <div class="card" style="margin-top:16px; text-align:left; border-left:4px solid ${isCorr ? 'var(--success)' : 'var(--error)'}">
+                    <p style="font-weight:600; color:var(--text-main); margin-bottom:8px;">${i+1}. ${q.q}</p>
+                    <div style="font-size:14px; margin-bottom:4px;">Jawaban Anda: <span style="color:${isCorr ? 'var(--success)' : 'var(--error)'}; font-weight:600;">${q.options[uAns]}</span></div>
+                    ${!isCorr ? `<div style="font-size:14px; margin-bottom:4px;">Jawaban Benar: <span style="color:var(--success); font-weight:600;">${q.options[q.ans]}</span></div>` : ''}
+                    <div style="font-size:13px; color:var(--text-muted); margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);">Penjelasan: ${q.exp}</div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+        return html;
+    }
+
+    function togglePembahasan() {
+        document.getElementById('pembahasan-panel').style.display = 'block';
+        window.scrollTo({top: document.getElementById('pembahasan-panel').offsetTop, behavior: 'smooth'});
+    }
+
+    /* --- PROGRESS --- */
+    function renderProgressPage() {
+        const p = AppState.progress;
+        const total = MATERIALS.length;
+        const comp = p.completed.length;
+        const prog = p.inProgress.length;
+        const not = total - comp - prog;
+        const pct = Math.round((comp / total) * 100);
+        
+        const avgScore = p.quizScores.length > 0 ? Math.round(p.quizScores.reduce((a,b)=>a+b,0)/p.quizScores.length) : 0;
+
+        return `
+            <h2>Progress Pembelajaran</h2>
+            <p>Pantau perkembangan belajar Anda di Ghorib Smart.</p>
+
+            <div class="card" style="margin-top:24px; padding:24px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+                    <span style="font-weight:600;">Penyelesaian Materi</span>
+                    <span style="color:var(--primary); font-weight:bold;">${pct}%</span>
+                </div>
+                <div class="progress-container" style="height:12px;">
+                    <div class="progress-bar" style="width: ${pct}%;"></div>
+                </div>
+                <div style="display:flex; gap:16px; margin-top:24px; font-size:13px;">
+                    <div style="flex:1; text-align:center;">
+                        <div style="font-size:24px; font-weight:bold; color:var(--success);">${comp}</div>
+                        <div style="color:var(--text-muted);">Selesai</div>
+                    </div>
+                    <div style="flex:1; text-align:center; border-left:1px solid var(--border); border-right:1px solid var(--border);">
+                        <div style="font-size:24px; font-weight:bold; color:var(--warning);">${prog}</div>
+                        <div style="color:var(--text-muted);">Sedang Dipelajari</div>
+                    </div>
+                    <div style="flex:1; text-align:center;">
+                        <div style="font-size:24px; font-weight:bold; color:var(--text-muted);">${not}</div>
+                        <div style="color:var(--text-muted);">Belum Sentuh</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card" style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:48px; height:48px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:24px;"><i class="ph-exam"></i></div>
+                    <div>
+                        <div style="font-size:13px; color:var(--text-muted);">Rata-rata Latihan</div>
+                        <div style="font-weight:bold; font-size:20px;">${avgScore}%</div>
+                    </div>
+                </div>
+                <div class="card" style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:48px; height:48px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:24px;"><i class="ph-clock-counter-clockwise"></i></div>
+                    <div>
+                        <div style="font-size:13px; color:var(--text-muted);">Sesi Latihan</div>
+                        <div style="font-weight:bold; font-size:20px;">${p.quizScores.length}x</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /* --- PROFILE & SETTINGS --- */
+    function renderProfile() {
+        const u = AppState.user;
+        const p = AppState.progress;
+        return `
+            <div style="text-align:center; padding:32px 0;">
+                <div style="width:100px; height:100px; border-radius:50%; background:var(--primary); color:white; font-size:40px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; border:4px solid var(--primary-light);">
+                    ${u.name.charAt(0).toUpperCase()}
+                </div>
+                <h2>${u.name}</h2>
+                <p>${u.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</p>
+            </div>
+            
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                    <span>Status</span>
+                    <span style="font-weight:600; color:var(--success);">Pelajar Aktif</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                    <span>Materi Selesai</span>
+                    <span style="font-weight:600;">${p.completed.length} dari 13</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                    <span>Akurasi Latihan</span>
+                    <span style="font-weight:600;">${p.quizScores.length ? Math.round(p.quizScores.reduce((a,b)=>a+b,0)/p.quizScores.length) : 0}%</span>
+                </div>
+            </div>
+
+            <div style="margin-top:24px; display:flex; flex-direction:column; gap:12px;">
+                <button class="btn btn-outline" style="justify-content:flex-start;" onclick="navigate('settings')"><i class="ph-gear"></i> Pengaturan Akun</button>
+                <button class="btn btn-outline" style="justify-content:flex-start; color:var(--error); border-color:var(--error);" onclick="doLogout()"><i class="ph-sign-out"></i> Keluar</button>
+            </div>
+        `;
+    }
+
+    function doLogout() {
+        AppState.user = null;
+        Storage.remove('user');
+        navigate('splash');
+    }
+
+    function renderSettings() {
+        return `
+            <h2>Pengaturan</h2>
+            <p>Konfigurasi aplikasi Anda.</p>
+            
+            <div class="card" style="margin-top:24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+                    <div><div style="font-weight:600;">Notifikasi Belajar</div><div style="font-size:12px; color:var(--text-muted);">Ingatkan saya untuk belajar</div></div>
+                    <input type="checkbox" checked style="width:20px; height:20px; accent-color:var(--primary);">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
+                    <div><div style="font-weight:600;">Reset Progress</div><div style="font-size:12px; color:var(--text-muted);">Hapus semua riwayat belajar & nilai</div></div>
+                    <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:12px; color:var(--error); border-color:var(--error);" onclick="confirmReset()">Reset</button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); cursor:pointer;" onclick="alert('Fitur informasi aplikasi. Dibuat oleh AI.')">
+                    <div style="font-weight:600;">Tentang Aplikasi</div>
+                    <i class="ph-caret-right"></i>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; cursor:pointer;" onclick="alert('FAQ belum tersedia di prototype ini.')">
+                    <div style="font-weight:600;">FAQ & Bantuan</div>
+                    <i class="ph-caret-right"></i>
+                </div>
+            </div>
+        `;
+    }
+
+    function confirmReset() {
+        if(confirm("Apakah Anda yakin? Progress pembelajaran dan nilai quiz akan dihapus.")) {
+            AppState.progress = { completed: [], inProgress: [], quizScores: [], lastMaterial: null };
+            saveProgress();
+            alert("Progress berhasil direset.");
+            navigate('progress');
+        }
+    }
+
+    // ==========================================
+    // 6. EVENT LISTENERS BINDING
+    // ==========================================
+    function attachViewListeners(viewId, container, params) {
+        if(viewId === 'identity') {
+            const btnSave = container.querySelector('#btn-save-identity');
+            const inpName = container.querySelector('#inp-name');
+            const radios = container.querySelectorAll('.radio-card');
+            let selectedGender = null;
+            
+            radios.forEach(r => r.onclick = () => {
+                radios.forEach(x => x.classList.remove('selected'));
+                r.classList.add('selected');
+                selectedGender = r.getAttribute('data-val');
+            });
+
+            btnSave.onclick = () => {
+                if(!inpName.value.trim() || !selectedGender) {
+                    alert("Mohon isi nama dan jenis kelamin.");
+                    return;
+                }
+                AppState.user = { name: inpName.value.trim(), gender: selectedGender, isLoggedIn: false };
+                navigate('login');
+            };
+        }
+
+        if(viewId === 'materials') {
+            // Initial render
+            container.querySelector('#material-list-container').innerHTML = buildMaterialCards('all', '');
+        }
+    }
+
+    // Helper exposed globally for tab filtering
+    window.setTab = function(el) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        filterMaterials();
+    };
+
+    window.filterMaterials = function() {
+        const activeTab = document.querySelector('.tab.active').getAttribute('data-filter');
+        const searchQ = document.getElementById('search-mat').value;
+        document.getElementById('material-list-container').innerHTML = buildMaterialCards(activeTab, searchQ);
+    };
+
+    // ==========================================
+    // 7. INITIALIZATION
+    // ==========================================
+    navigate('splash');
+
+</script>
+</body>
+</html>
