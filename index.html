@@ -84,15 +84,6 @@
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); color: var(--text-muted); font-size: 12px; padding: var(--sp-2); border-radius: var(--rad-sm); flex: 1; }
         .nav-item i { font-size: 24px; }
         .nav-item.active { color: var(--primary); font-weight: 600; }
-
-        /* Mobile Profile Menu — minimal addition */
-        #mobile-profile-menu { display: none; position: fixed; left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad-md); box-shadow: var(--shadow-lg); padding: 8px; z-index: 60; }
-        #mobile-profile-menu.active { display: block; }
-        #mobile-profile-menu .mobile-profile-menu-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border-radius: var(--rad-sm); color: var(--text-main); font-size: 14px; font-weight: 500; text-align: left; }
-        #mobile-profile-menu .mobile-profile-menu-item:active { background: var(--primary-light); color: var(--primary); }
-        #mobile-profile-menu .mobile-profile-menu-item i { font-size: 20px; color: var(--primary); }
-        #mobile-profile-menu-backdrop { display: none; position: fixed; inset: 0; z-index: 55; background: transparent; }
-        #mobile-profile-menu-backdrop.active { display: block; }
         
         .sidebar-item { display: flex; align-items: center; gap: var(--sp-3); padding: 12px 16px; color: var(--text-muted); font-weight: 500; border-radius: var(--rad-sm); margin-bottom: var(--sp-2); transition: all 0.2s; }
         .sidebar-item:hover { background: var(--bg-main); }
@@ -100,7 +91,31 @@
         .sidebar-item i { font-size: 20px; }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-6); padding-top: var(--sp-4); }
-        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--primary); }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--primary); overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .mobile-profile-trigger { display: none; }
+        .profile-menu { position: fixed; top: 68px; right: 16px; width: 210px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad-md); box-shadow: var(--shadow-lg); padding: 8px; z-index: 80; }
+        .profile-menu-header { display: flex; align-items: center; gap: 10px; padding: 8px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+        .profile-menu-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; overflow: hidden; flex-shrink: 0; }
+        .profile-menu-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .profile-menu-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 10px; border-radius: var(--rad-sm); color: var(--text-main); font-size: 14px; text-align: left; }
+        .profile-menu-item:hover, .profile-menu-item:active { background: var(--bg-main); }
+        .profile-menu-item i { font-size: 19px; color: var(--primary); width: 20px; }
+        .profile-menu-backdrop { position: fixed; inset: 0; z-index: 75; background: transparent; }
+
+        .profile-editor { margin-top: 16px; }
+        .profile-photo-preview { width: 120px; height: 120px; margin: 0 auto 14px; border-radius: 50%; overflow: hidden; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 700; border: 3px solid var(--primary); }
+        .profile-photo-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .profile-photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .profile-editor-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .crop-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .crop-dialog { width: min(100%, 440px); max-height: 92vh; overflow-y: auto; background: var(--surface); border-radius: var(--rad-lg); padding: 20px; box-shadow: var(--shadow-lg); }
+        .crop-area { width: min(100%, 360px); aspect-ratio: 1 / 1; margin: 0 auto 14px; overflow: hidden; position: relative; background: #111; border-radius: var(--rad-md); touch-action: none; user-select: none; }
+        .crop-image { position: absolute; max-width: none; max-height: none; transform-origin: 0 0; cursor: grab; will-change: transform; }
+        .crop-image.dragging { cursor: grabbing; }
+        .crop-controls { display: flex; align-items: center; gap: 10px; margin: 10px 0 16px; }
+        .crop-controls label { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+        .crop-controls input { flex: 1; }
 
         .progress-container { width: 100%; background: var(--border); border-radius: var(--rad-full); height: 8px; overflow: hidden; margin-top: var(--sp-2); }
         .progress-bar { height: 100%; background: var(--primary); border-radius: var(--rad-full); transition: width 0.5s ease; }
@@ -160,6 +175,29 @@
         .popup-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top-left-radius: var(--rad-lg); border-top-right-radius: var(--rad-lg); padding: var(--sp-6); z-index: 250; box-shadow: 0 -10px 25px rgba(0,0,0,0.25); transform: translateY(100%); transition: transform 0.3s ease; }
         .popup-sheet.active { transform: translateY(0); }
 
+        @media (max-width: 1023px) {
+            .mobile-profile-trigger {
+                position: fixed;
+                top: 12px;
+                right: 16px;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: var(--primary-light);
+                color: var(--primary);
+                border: 2px solid var(--primary);
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 17px;
+                overflow: hidden;
+                z-index: 70;
+                box-shadow: var(--shadow-sm);
+            }
+            .mobile-profile-trigger img { width: 100%; height: 100%; object-fit: cover; display: block; }
+            #main-content { padding-top: 4px; }
+        }
+
         @media (min-width: 1024px) {
             #bottom-nav { display: none; }
             #sidebar { display: flex; }
@@ -186,14 +224,9 @@
     <!-- Bottom Nav Mobile -->
     <nav id="bottom-nav"></nav>
 
-    <!-- Mobile Profile Menu -->
-    <div id="mobile-profile-menu-backdrop" onclick="closeMobileProfileMenu()"></div>
-    <div id="mobile-profile-menu" aria-label="Menu Profil Mobile">
-        <button class="mobile-profile-menu-item" onclick="navigateFromMobileProfile('about')"><i class="ph-info"></i><span>Tentang</span></button>
-        <button class="mobile-profile-menu-item" onclick="navigateFromMobileProfile('faq')"><i class="ph-question"></i><span>FAQ</span></button>
-        <button class="mobile-profile-menu-item" onclick="navigateFromMobileProfile('profile')"><i class="ph-user"></i><span>Profil</span></button>
-        <button class="mobile-profile-menu-item" onclick="navigateFromMobileProfile('settings')"><i class="ph-gear"></i><span>Pengaturan</span></button>
-    </div>
+    <!-- Mobile Profile Access -->
+    <button id="mobile-profile-trigger" class="mobile-profile-trigger" aria-label="Buka menu profil" onclick="toggleProfileMenu(event)"></button>
+    <div id="mobile-profile-menu-root"></div>
 </div>
 
 <!-- AI Camera Scanner Overlay -->
@@ -416,6 +449,7 @@
     function navigate(viewId, params = null) {
         window.scrollTo(0, 0);
         stopAudio();
+        closeProfileMenu();
         renderNavigation(viewId);
         
         mainContent.innerHTML = '';
@@ -460,6 +494,12 @@
             document.getElementById('bottom-nav').style.display = window.innerWidth < 1024 ? 'flex' : 'none';
         }
 
+        const mobileTrigger = document.getElementById('mobile-profile-trigger');
+        if(mobileTrigger) {
+            mobileTrigger.style.display = (window.innerWidth < 1024 && !noNavScreens.includes(activeId) && activeId !== 'home') ? 'flex' : 'none';
+            renderMobileProfileTrigger();
+        }
+
         const buildNav = (isSidebar) => NAV_ITEMS.map(item => `
             <a href="#" onclick="navigate('${item.id}'); return false;" class="${isSidebar ? 'sidebar-item' : 'nav-item'} ${item.id === activeId ? 'active' : ''}">
                 <i class="${item.icon} ${item.id === activeId ? 'ph-fill' : ''}"></i>
@@ -473,38 +513,8 @@
             <a href="#" onclick="navigate('settings'); return false;" class="sidebar-item ${activeId === 'settings' ? 'active' : ''}"><i class="ph-gear"></i> Pengaturan</a>
         ` : '');
 
-        bottomNav.innerHTML = buildNav(false) + `
-            <button type="button" class="nav-item ${['profile','settings','about','faq'].includes(activeId) ? 'active' : ''}" onclick="toggleMobileProfileMenu(event)" aria-label="Profil">
-                <i class="ph-user ${['profile','settings','about','faq'].includes(activeId) ? 'ph-fill' : ''}"></i>
-                <span>Profil</span>
-            </button>
-        `;
+        bottomNav.innerHTML = buildNav(false);
         sidebarContainer.innerHTML = buildNav(true);
-        closeMobileProfileMenu();
-    }
-
-    function toggleMobileProfileMenu(event) {
-        if (event) event.stopPropagation();
-        if (window.innerWidth >= 1024) return;
-
-        const menu = document.getElementById('mobile-profile-menu');
-        const backdrop = document.getElementById('mobile-profile-menu-backdrop');
-        if (!menu || !backdrop) return;
-
-        const isOpen = menu.classList.toggle('active');
-        backdrop.classList.toggle('active', isOpen);
-    }
-
-    function closeMobileProfileMenu() {
-        const menu = document.getElementById('mobile-profile-menu');
-        const backdrop = document.getElementById('mobile-profile-menu-backdrop');
-        if (menu) menu.classList.remove('active');
-        if (backdrop) backdrop.classList.remove('active');
-    }
-
-    function navigateFromMobileProfile(viewId) {
-        closeMobileProfileMenu();
-        navigate(viewId);
     }
 
     // ==========================================
@@ -782,7 +792,9 @@
                     <div style="background:var(--primary-light); padding:4px 10px; border-radius:var(--rad-full); font-size:12px; font-weight:600; color:var(--primary);">
                         🔥 ${p.streak} Hari
                     </div>
-                    <div class="avatar" onclick="navigate('profile')">${user.name.charAt(0).toUpperCase()}</div>
+                    <div class="avatar" onclick="handleProfileAvatarClick(event)" role="button" tabindex="0" aria-label="Buka menu profil">
+                        ${renderAvatarContent(user, 'header')}
+                    </div>
                 </div>
             </div>
 
@@ -1080,26 +1092,331 @@
         `;
     }
 
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        }[char]));
+    }
+
+    function renderAvatarContent(user, context = 'header') {
+        if(user && user.profileImage) {
+            return `<img src="${user.profileImage}" alt="Foto profil ${escapeHtml(user.name || 'Pengguna')}">`;
+        }
+        return escapeHtml((user && user.name ? user.name.charAt(0) : 'P').toUpperCase());
+    }
+
+    let profileCropState = {
+        image: null,
+        scale: 1,
+        baseScale: 1,
+        x: 0,
+        y: 0,
+        dragging: false,
+        startX: 0,
+        startY: 0,
+        originX: 0,
+        originY: 0
+    };
+
+    function renderMobileProfileTrigger() {
+        const trigger = document.getElementById('mobile-profile-trigger');
+        if(!trigger) return;
+        const user = AppState.user || { name: 'P' };
+        trigger.innerHTML = renderAvatarContent(user, 'mobile');
+        trigger.style.display = 'flex';
+    }
+
+    function renderMobileProfileMenu() {
+        const root = document.getElementById('mobile-profile-menu-root');
+        if(!root) return;
+        const user = AppState.user || { name: 'Pengguna' };
+        root.innerHTML = `
+            <div class="profile-menu-backdrop" onclick="closeProfileMenu()" aria-hidden="true"></div>
+            <div class="profile-menu" role="menu" aria-label="Menu profil">
+                <div class="profile-menu-header">
+                    <div class="profile-menu-avatar">${renderAvatarContent(user, 'menu')}</div>
+                    <div style="min-width:0;">
+                        <div style="font-weight:700; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(user.name || 'Pengguna')}</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Menu Profil</div>
+                    </div>
+                </div>
+                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('about')"><i class="ph-info"></i><span>Tentang</span></button>
+                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('faq')"><i class="ph-question"></i><span>FAQ</span></button>
+                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('profile')"><i class="ph-user"></i><span>Profil</span></button>
+                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('settings')"><i class="ph-gear"></i><span>Pengaturan</span></button>
+            </div>
+        `;
+    }
+
+    function handleProfileAvatarClick(event) {
+        if(window.innerWidth < 1024) toggleProfileMenu(event);
+        else navigate('profile');
+    }
+
+    function toggleProfileMenu(event) {
+        if(event) event.stopPropagation();
+        const root = document.getElementById('mobile-profile-menu-root');
+        if(!root) return;
+        if(root.innerHTML.trim()) {
+            closeProfileMenu();
+        } else {
+            renderMobileProfileMenu();
+        }
+    }
+
+    function closeProfileMenu() {
+        const root = document.getElementById('mobile-profile-menu-root');
+        if(root) root.innerHTML = '';
+    }
+
+    function navigateFromProfileMenu(viewId) {
+        closeProfileMenu();
+        navigate(viewId);
+    }
+
+    function initProfilePhotoUpload(container) {
+        const input = container.querySelector('#profile-photo-input');
+        if(!input) return;
+
+        input.addEventListener('change', () => {
+            const file = input.files && input.files[0];
+            if(!file) return;
+
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if(!allowedTypes.includes(file.type)) {
+                alert('Format foto belum didukung. Gunakan JPG, PNG, atau WEBP.');
+                input.value = '';
+                return;
+            }
+
+            if(file.size > 5 * 1024 * 1024) {
+                alert('Ukuran foto terlalu besar. Gunakan foto maksimal 5 MB.');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => openProfileCrop(String(reader.result));
+            reader.onerror = () => alert('Foto tidak dapat dibaca. Silakan pilih foto lain.');
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function openProfileCrop(dataUrl) {
+        const modal = document.getElementById('profile-crop-modal');
+        const area = document.getElementById('profile-crop-area');
+        const zoom = document.getElementById('profile-crop-zoom');
+        if(!modal || !area || !zoom) return;
+
+        const img = new Image();
+        img.onload = () => {
+            profileCropState.image = img;
+            profileCropState.scale = 1;
+            profileCropState.x = 0;
+            profileCropState.y = 0;
+
+            area.innerHTML = '';
+            const imageEl = document.createElement('img');
+            imageEl.className = 'crop-image';
+            imageEl.alt = 'Crop foto profil';
+            imageEl.draggable = false;
+            imageEl.src = dataUrl;
+            area.appendChild(imageEl);
+
+            profileCropState.imageEl = imageEl;
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            zoom.value = '1';
+
+            requestAnimationFrame(() => {
+                const rect = area.getBoundingClientRect();
+                profileCropState.baseScale = Math.max(rect.width / img.naturalWidth, rect.height / img.naturalHeight);
+                profileCropState.scale = profileCropState.baseScale;
+                profileCropState.x = (rect.width - img.naturalWidth * profileCropState.scale) / 2;
+                profileCropState.y = (rect.height - img.naturalHeight * profileCropState.scale) / 2;
+                applyProfileCropTransform();
+            });
+        };
+        img.onerror = () => alert('Foto tidak dapat diproses. Silakan pilih foto lain.');
+        img.src = dataUrl;
+    }
+
+    function applyProfileCropTransform() {
+        const el = profileCropState.imageEl;
+        if(!el) return;
+        el.style.width = `${profileCropState.image.naturalWidth}px`;
+        el.style.height = `${profileCropState.image.naturalHeight}px`;
+        el.style.transform = `translate(${profileCropState.x}px, ${profileCropState.y}px) scale(${profileCropState.scale})`;
+    }
+
+    function setProfileCropZoom(value) {
+        const oldScale = profileCropState.scale;
+        const newScale = profileCropState.baseScale * Number(value);
+        const area = document.getElementById('profile-crop-area');
+        if(!area || !oldScale || !newScale) return;
+
+        const rect = area.getBoundingClientRect();
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        profileCropState.x = cx - (cx - profileCropState.x) * (newScale / oldScale);
+        profileCropState.y = cy - (cy - profileCropState.y) * (newScale / oldScale);
+        profileCropState.scale = newScale;
+        clampProfileCropPosition();
+        applyProfileCropTransform();
+    }
+
+    function clampProfileCropPosition() {
+        const area = document.getElementById('profile-crop-area');
+        if(!area || !profileCropState.image) return;
+        const rect = area.getBoundingClientRect();
+        const width = profileCropState.image.naturalWidth * profileCropState.scale;
+        const height = profileCropState.image.naturalHeight * profileCropState.scale;
+        profileCropState.x = Math.min(0, Math.max(rect.width - width, profileCropState.x));
+        profileCropState.y = Math.min(0, Math.max(rect.height - height, profileCropState.y));
+    }
+
+    function saveProfileCrop() {
+        const area = document.getElementById('profile-crop-area');
+        if(!area || !profileCropState.image) return;
+
+        clampProfileCropPosition();
+        const size = 512;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        const rect = area.getBoundingClientRect();
+        const sourceScale = profileCropState.scale;
+        const sourceX = -profileCropState.x / sourceScale;
+        const sourceY = -profileCropState.y / sourceScale;
+        const sourceSize = rect.width / sourceScale;
+
+        ctx.drawImage(
+            profileCropState.image,
+            sourceX,
+            sourceY,
+            sourceSize,
+            sourceSize,
+            0,
+            0,
+            size,
+            size
+        );
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.86);
+        if(!AppState.user) AppState.user = { name: 'Aulia', gender: 'L', isLoggedIn: true };
+        AppState.user.profileImage = dataUrl;
+        Storage.set('user', AppState.user);
+
+        closeProfileCrop();
+        renderMobileProfileTrigger();
+        renderMobileProfileMenu();
+        navigate('profile');
+    }
+
+    function closeProfileCrop() {
+        const modal = document.getElementById('profile-crop-modal');
+        if(modal) {
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        profileCropState.image = null;
+        profileCropState.imageEl = null;
+    }
+
+    function bindProfileCropInteractions() {
+        const area = document.getElementById('profile-crop-area');
+        const zoom = document.getElementById('profile-crop-zoom');
+        if(!area || !zoom) return;
+
+        zoom.oninput = () => setProfileCropZoom(zoom.value);
+
+        const startDrag = (clientX, clientY) => {
+            profileCropState.dragging = true;
+            profileCropState.startX = clientX;
+            profileCropState.startY = clientY;
+            profileCropState.originX = profileCropState.x;
+            profileCropState.originY = profileCropState.y;
+            profileCropState.imageEl?.classList.add('dragging');
+        };
+
+        const moveDrag = (clientX, clientY) => {
+            if(!profileCropState.dragging) return;
+            profileCropState.x = profileCropState.originX + (clientX - profileCropState.startX);
+            profileCropState.y = profileCropState.originY + (clientY - profileCropState.startY);
+            clampProfileCropPosition();
+            applyProfileCropTransform();
+        };
+
+        const endDrag = () => {
+            profileCropState.dragging = false;
+            profileCropState.imageEl?.classList.remove('dragging');
+        };
+
+        area.onpointerdown = (e) => {
+            e.preventDefault();
+            area.setPointerCapture?.(e.pointerId);
+            startDrag(e.clientX, e.clientY);
+        };
+        area.onpointermove = (e) => {
+            e.preventDefault();
+            moveDrag(e.clientX, e.clientY);
+        };
+        area.onpointerup = endDrag;
+        area.onpointercancel = endDrag;
+        area.onpointerleave = () => {
+            if(profileCropState.dragging) endDrag();
+        };
+    }
+
     function renderProfile() {
         const u = AppState.user || { name: 'Aulia', gender: 'L' };
         const lvl = calculateLevel();
+        const photo = u.profileImage || '';
         return `
             <div style="text-align:center; padding:20px 0;">
-                <div style="width:72px; height:72px; border-radius:50%; background:var(--primary); color:white; font-size:28px; display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
-                    ${u.name.charAt(0).toUpperCase()}
+                <div class="profile-photo-preview" id="profile-photo-preview">
+                    ${photo ? `<img src="${photo}" alt="Foto profil ${escapeHtml(u.name)}">` : `<div class="profile-photo-placeholder">${escapeHtml(u.name.charAt(0).toUpperCase())}</div>`}
                 </div>
-                <h2>${u.name}</h2>
+                <h2>${escapeHtml(u.name)}</h2>
                 <p style="font-size:13px;">Level ${lvl.level} • ${lvl.name}</p>
+                <div class="profile-editor">
+                    <input type="file" id="profile-photo-input" accept="image/jpeg,image/png,image/webp" hidden>
+                    <button class="btn btn-outline" style="width:auto; padding:9px 16px;" onclick="document.getElementById('profile-photo-input').click()">
+                        <i class="ph-camera"></i> ${photo ? 'Ubah Foto' : 'Tambah Foto'}
+                    </button>
+                    <p style="font-size:12px; margin:8px 0 0;">JPG, PNG, atau WEBP • Maksimal 5 MB</p>
+                </div>
             </div>
             <div class="card">
                 <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px;">
-                    <span>Nama</span> <b>${u.name}</b>
+                    <span>Nama</span> <b>${escapeHtml(u.name)}</b>
                 </div>
                 <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
                     <span>Total XP</span> <b style="color:var(--primary);">${AppState.progress.xp} XP</b>
                 </div>
             </div>
             <button class="btn btn-outline" style="color:var(--error); border-color:var(--error); margin-top:20px;" onclick="doLogout()"><i class="ph-sign-out"></i> Keluar</button>
+
+            <div id="profile-crop-modal" class="crop-modal" style="display:none;" aria-hidden="true">
+                <div class="crop-dialog" role="dialog" aria-modal="true" aria-labelledby="crop-title">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h3 id="crop-title">Crop Foto Profil 1:1</h3>
+                        <button type="button" onclick="closeProfileCrop()" aria-label="Tutup" style="font-size:22px; color:var(--text-muted);"><i class="ph-x"></i></button>
+                    </div>
+                    <p style="font-size:13px; margin-bottom:12px;">Geser foto dan atur zoom untuk menentukan bagian yang digunakan.</p>
+                    <div id="profile-crop-area" class="crop-area"></div>
+                    <div class="crop-controls">
+                        <label for="profile-crop-zoom">Zoom</label>
+                        <input id="profile-crop-zoom" type="range" min="1" max="3" step="0.01" value="1">
+                    </div>
+                    <div class="profile-editor-actions">
+                        <button type="button" class="btn btn-outline" style="width:auto; padding:9px 16px;" onclick="closeProfileCrop()">Batal</button>
+                        <button type="button" class="btn btn-primary" style="width:auto; padding:9px 16px;" onclick="saveProfileCrop()"><i class="ph-check"></i> Simpan</button>
+                    </div>
+                </div>
+            </div>
         `;
     }
 
@@ -1193,11 +1510,11 @@
         if(viewId === 'materials') {
             container.querySelector('#material-list-container').innerHTML = buildMaterialCards('all', '');
         }
+        if(viewId === 'profile') {
+            initProfilePhotoUpload(container);
+            bindProfileCropInteractions();
+        }
     }
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 1024) closeMobileProfileMenu();
-    });
 
     // Initial Load
     navigate('splash');
