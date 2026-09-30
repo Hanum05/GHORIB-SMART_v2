@@ -93,6 +93,21 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-6); padding-top: var(--sp-4); }
         .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--primary); }
 
+        /* Mobile menu - hanya aktif pada layar non-desktop */
+        #mobile-menu-trigger { display: none; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: var(--rad-full); background: var(--surface); color: var(--primary); align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--shadow-sm); flex-shrink: 0; }
+        #mobile-menu-trigger:active { transform: scale(0.97); }
+        #mobile-menu-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.18); z-index: 110; }
+        #mobile-menu-backdrop.open { display: block; }
+        #mobile-menu { position: fixed; top: 72px; right: 16px; width: min(300px, calc(100vw - 32px)); max-height: calc(100vh - 96px); overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad-md); box-shadow: var(--shadow-lg); padding: var(--sp-3); z-index: 120; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease; }
+        #mobile-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+        .mobile-menu-title { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); padding: 8px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+        .mobile-menu-title span { font-weight: 700; color: var(--primary); }
+        .mobile-menu-close { width: 36px; height: 36px; border-radius: var(--rad-sm); color: var(--text-muted); font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .mobile-menu-item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: 12px 10px; border-radius: var(--rad-sm); color: var(--text-main); font-size: 14px; font-weight: 500; text-align: left; }
+        .mobile-menu-item i { width: 22px; text-align: center; color: var(--primary); font-size: 20px; }
+        .mobile-menu-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .mobile-menu-item:active { background: var(--primary-light); }
+
         .progress-container { width: 100%; background: var(--border); border-radius: var(--rad-full); height: 8px; overflow: hidden; margin-top: var(--sp-2); }
         .progress-bar { height: 100%; background: var(--primary); border-radius: var(--rad-full); transition: width 0.5s ease; }
 
@@ -151,6 +166,10 @@
         .popup-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top-left-radius: var(--rad-lg); border-top-right-radius: var(--rad-lg); padding: var(--sp-6); z-index: 250; box-shadow: 0 -10px 25px rgba(0,0,0,0.25); transform: translateY(100%); transition: transform 0.3s ease; }
         .popup-sheet.active { transform: translateY(0); }
 
+        @media (max-width: 1023px) {
+            #mobile-menu-trigger { display: inline-flex; }
+        }
+
         @media (min-width: 1024px) {
             #bottom-nav { display: none; }
             #sidebar { display: flex; }
@@ -176,6 +195,18 @@
 
     <!-- Bottom Nav Mobile -->
     <nav id="bottom-nav"></nav>
+</div>
+
+<!-- Mobile Menu: akses seluruh navigasi yang sudah ada -->
+<div id="mobile-menu-backdrop" onclick="closeMobileMenu()"></div>
+<div id="mobile-menu" aria-hidden="true">
+    <div class="mobile-menu-title">
+        <span>Menu GHORIB SMART</span>
+        <button class="mobile-menu-close" type="button" onclick="closeMobileMenu()" aria-label="Tutup menu">
+            <i class="ph-x"></i>
+        </button>
+    </div>
+    <div id="mobile-menu-items"></div>
 </div>
 
 <!-- AI Camera Scanner Overlay -->
@@ -426,8 +457,90 @@
 
         if(viewRenderers[viewId]) {
             viewWrapper.innerHTML = viewRenderers[viewId]();
+
+            if(window.innerWidth < 1024 && !['splash','onboarding','identity','login','welcome','home'].includes(viewId)) {
+                const user = AppState.user || { name: 'P' };
+                const mobileHeader = document.createElement('div');
+                mobileHeader.style.cssText = 'display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:8px;';
+                mobileHeader.innerHTML = `
+                    <div class="avatar" onclick="navigate('profile')" aria-label="Buka profil">${String(user.name || 'P').charAt(0).toUpperCase()}</div>
+                    <button id="mobile-menu-trigger" type="button" aria-label="Buka menu navigasi" aria-expanded="false">
+                        <i class="ph-list"></i>
+                    </button>
+                `;
+                viewWrapper.prepend(mobileHeader);
+            }
+
             mainContent.appendChild(viewWrapper);
+            if(window.innerWidth < 1024 && !['splash','onboarding','identity','login','welcome'].includes(viewId)) {
+                renderMobileMenu(viewId);
+            }
             attachViewListeners(viewId, viewWrapper, params);
+        }
+    }
+
+    function getMobileMenuItems(activeId) {
+        return [
+            ...NAV_ITEMS.map(item => ({
+                id: item.id,
+                icon: item.icon,
+                label: item.label
+            })),
+            { id: 'about', icon: 'ph-info', label: 'Tentang' },
+            { id: 'faq', icon: 'ph-question', label: 'FAQ' },
+            { id: 'profile', icon: 'ph-user', label: 'Profil' },
+            { id: 'settings', icon: 'ph-gear', label: 'Pengaturan' }
+        ].map(item => `
+            <a href="#" onclick="navigateFromMobileMenu('${item.id}'); return false;" class="mobile-menu-item ${item.id === activeId ? 'active' : ''}">
+                <i class="${item.icon} ${item.id === activeId ? 'ph-fill' : ''}"></i>
+                <span>${item.label}</span>
+            </a>
+        `).join('');
+    }
+
+    function openMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const backdrop = document.getElementById('mobile-menu-backdrop');
+        if(!menu || !backdrop) return;
+        menu.classList.add('open');
+        backdrop.classList.add('open');
+        menu.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        const trigger = document.getElementById('mobile-menu-trigger');
+        if(trigger) trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const backdrop = document.getElementById('mobile-menu-backdrop');
+        if(!menu || !backdrop) return;
+        menu.classList.remove('open');
+        backdrop.classList.remove('open');
+        menu.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        const trigger = document.getElementById('mobile-menu-trigger');
+        if(trigger) trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function navigateFromMobileMenu(viewId) {
+        closeMobileMenu();
+        navigate(viewId);
+    }
+
+    function renderMobileMenu(activeId) {
+        const items = document.getElementById('mobile-menu-items');
+        if(items) items.innerHTML = getMobileMenuItems(activeId);
+
+        const trigger = document.getElementById('mobile-menu-trigger');
+        if(trigger) {
+            trigger.setAttribute('aria-label', 'Buka menu navigasi');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.innerHTML = '<i class="ph-list"></i>';
+            trigger.onclick = () => {
+                const menu = document.getElementById('mobile-menu');
+                if(menu && menu.classList.contains('open')) closeMobileMenu();
+                else openMobileMenu();
+            };
         }
     }
 
@@ -436,11 +549,14 @@
         if (noNavScreens.includes(activeId)) {
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('bottom-nav').style.display = 'none';
+            closeMobileMenu();
             return;
         } else {
             document.getElementById('sidebar').style.display = window.innerWidth >= 1024 ? 'flex' : 'none';
             document.getElementById('bottom-nav').style.display = window.innerWidth < 1024 ? 'flex' : 'none';
         }
+
+        renderMobileMenu(activeId);
 
         const buildNav = (isSidebar) => NAV_ITEMS.map(item => `
             <a href="#" onclick="navigate('${item.id}'); return false;" class="${isSidebar ? 'sidebar-item' : 'nav-item'} ${item.id === activeId ? 'active' : ''}">
@@ -735,6 +851,9 @@
                         🔥 ${p.streak} Hari
                     </div>
                     <div class="avatar" onclick="navigate('profile')">${user.name.charAt(0).toUpperCase()}</div>
+                    <button id="mobile-menu-trigger" type="button" aria-label="Buka menu navigasi" aria-expanded="false">
+                        <i class="ph-list"></i>
+                    </button>
                 </div>
             </div>
 
@@ -1146,6 +1265,10 @@
             container.querySelector('#material-list-container').innerHTML = buildMaterialCards('all', '');
         }
     }
+
+    window.addEventListener('resize', () => {
+        if(window.innerWidth >= 1024) closeMobileMenu();
+    });
 
     // Initial Load
     navigate('splash');
