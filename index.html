@@ -91,31 +91,7 @@
         .sidebar-item i { font-size: 20px; }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-6); padding-top: var(--sp-4); }
-        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--primary); overflow: hidden; }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .mobile-profile-trigger { display: none; }
-        .profile-menu { position: fixed; top: 68px; right: 16px; width: 210px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad-md); box-shadow: var(--shadow-lg); padding: 8px; z-index: 80; }
-        .profile-menu-header { display: flex; align-items: center; gap: 10px; padding: 8px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
-        .profile-menu-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; overflow: hidden; flex-shrink: 0; }
-        .profile-menu-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .profile-menu-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 10px; border-radius: var(--rad-sm); color: var(--text-main); font-size: 14px; text-align: left; }
-        .profile-menu-item:hover, .profile-menu-item:active { background: var(--bg-main); }
-        .profile-menu-item i { font-size: 19px; color: var(--primary); width: 20px; }
-        .profile-menu-backdrop { position: fixed; inset: 0; z-index: 75; background: transparent; }
-
-        .profile-editor { margin-top: 16px; }
-        .profile-photo-preview { width: 120px; height: 120px; margin: 0 auto 14px; border-radius: 50%; overflow: hidden; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 700; border: 3px solid var(--primary); }
-        .profile-photo-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .profile-photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .profile-editor-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .crop-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 16px; }
-        .crop-dialog { width: min(100%, 440px); max-height: 92vh; overflow-y: auto; background: var(--surface); border-radius: var(--rad-lg); padding: 20px; box-shadow: var(--shadow-lg); }
-        .crop-area { width: min(100%, 360px); aspect-ratio: 1 / 1; margin: 0 auto 14px; overflow: hidden; position: relative; background: #111; border-radius: var(--rad-md); touch-action: none; user-select: none; }
-        .crop-image { position: absolute; max-width: none; max-height: none; transform-origin: 0 0; cursor: grab; will-change: transform; }
-        .crop-image.dragging { cursor: grabbing; }
-        .crop-controls { display: flex; align-items: center; gap: 10px; margin: 10px 0 16px; }
-        .crop-controls label { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
-        .crop-controls input { flex: 1; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--primary); }
 
         .progress-container { width: 100%; background: var(--border); border-radius: var(--rad-full); height: 8px; overflow: hidden; margin-top: var(--sp-2); }
         .progress-bar { height: 100%; background: var(--primary); border-radius: var(--rad-full); transition: width 0.5s ease; }
@@ -160,6 +136,107 @@
         .badge-title { font-weight: 600; font-size: 13px; }
         .badge-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
+
+        /* Mobile Profile Menu + Profile Photo Crop */
+        .profile-menu-wrap { position: relative; }
+        .profile-trigger { cursor: pointer; }
+        .profile-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 190px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--rad-md);
+            box-shadow: var(--shadow-lg);
+            padding: 8px;
+            z-index: 80;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+        }
+        .profile-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .profile-menu-item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            border-radius: var(--rad-sm);
+            color: var(--text-main);
+            font-size: 14px;
+            text-align: left;
+        }
+        .profile-menu-item:hover, .profile-menu-item:active { background: var(--primary-light); color: var(--primary); }
+        .profile-menu-item i { width: 20px; color: var(--primary); font-size: 18px; }
+        .profile-photo { object-fit: cover; border-radius: 50%; display: block; }
+
+        #profile-crop-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .68);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 400;
+        }
+        #profile-crop-modal.active { display: flex; }
+        .profile-crop-dialog {
+            width: min(100%, 430px);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            background: var(--surface);
+            border-radius: var(--rad-lg);
+            padding: var(--sp-6);
+            box-shadow: var(--shadow-lg);
+        }
+        .crop-stage {
+            width: min(100%, 360px);
+            aspect-ratio: 1 / 1;
+            margin: 14px auto;
+            position: relative;
+            overflow: hidden;
+            background: #111827;
+            border-radius: var(--rad-md);
+            touch-action: none;
+            user-select: none;
+        }
+        .crop-stage::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border: 2px solid rgba(255,255,255,.9);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,.18);
+        }
+        #profile-crop-image {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            max-width: none;
+            transform-origin: center center;
+            user-select: none;
+            -webkit-user-drag: none;
+            cursor: grab;
+        }
+        #profile-crop-image.dragging { cursor: grabbing; }
+        .crop-controls { display:flex; align-items:center; gap:10px; margin:10px 0 14px; }
+        .crop-controls input { flex:1; accent-color: var(--primary); }
+        .crop-preview-wrap { text-align:center; margin-top:10px; }
+        #profile-crop-preview {
+            width:88px;
+            height:88px;
+            border-radius:50%;
+            object-fit:cover;
+            border:2px solid var(--primary-light);
+            display:none;
+            margin:8px auto 0;
+        }
+        .crop-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+
         /* Scanner UI */
         #scanner-view { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 200; display: none; flex-direction: column; }
         #scanner-view.active { display: flex; }
@@ -174,29 +251,6 @@
         .scanner-footer { padding: 20px; background: rgba(0,0,0,0.85); color: white; text-align: center; position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; }
         .popup-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top-left-radius: var(--rad-lg); border-top-right-radius: var(--rad-lg); padding: var(--sp-6); z-index: 250; box-shadow: 0 -10px 25px rgba(0,0,0,0.25); transform: translateY(100%); transition: transform 0.3s ease; }
         .popup-sheet.active { transform: translateY(0); }
-
-        @media (max-width: 1023px) {
-            .mobile-profile-trigger {
-                position: fixed;
-                top: 12px;
-                right: 16px;
-                width: 44px;
-                height: 44px;
-                border-radius: 50%;
-                background: var(--primary-light);
-                color: var(--primary);
-                border: 2px solid var(--primary);
-                align-items: center;
-                justify-content: center;
-                font-weight: 700;
-                font-size: 17px;
-                overflow: hidden;
-                z-index: 70;
-                box-shadow: var(--shadow-sm);
-            }
-            .mobile-profile-trigger img { width: 100%; height: 100%; object-fit: cover; display: block; }
-            #main-content { padding-top: 4px; }
-        }
 
         @media (min-width: 1024px) {
             #bottom-nav { display: none; }
@@ -223,10 +277,6 @@
 
     <!-- Bottom Nav Mobile -->
     <nav id="bottom-nav"></nav>
-
-    <!-- Mobile Profile Access -->
-    <button id="mobile-profile-trigger" class="mobile-profile-trigger" aria-label="Buka menu profil" onclick="toggleProfileMenu(event)"></button>
-    <div id="mobile-profile-menu-root"></div>
 </div>
 
 <!-- AI Camera Scanner Overlay -->
@@ -396,6 +446,249 @@
         remove: (key) => localStorage.removeItem(`ghorib_${key}`)
     };
 
+    const PROFILE_PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+    const PROFILE_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    let profileCropState = {
+        image: null,
+        objectUrl: null,
+        scale: 1,
+        minScale: 1,
+        x: 0,
+        y: 0,
+        dragging: false,
+        startX: 0,
+        startY: 0,
+        startImageX: 0,
+        startImageY: 0
+    };
+
+    function getProfilePhoto() {
+        return AppState.user && AppState.user.profilePhoto ? AppState.user.profilePhoto : null;
+    }
+
+    function avatarMarkup(user, size = 44) {
+        const photo = getProfilePhoto();
+        const initial = (user && user.name ? user.name : 'A').charAt(0).toUpperCase();
+        if(photo) {
+            return `<img class="avatar profile-photo" src="${photo}" alt="Foto profil" style="width:${size}px;height:${size}px;" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'avatar',textContent:'${initial}'}));">`;
+        }
+        return `<div class="avatar" style="width:${size}px;height:${size}px;">${initial}</div>`;
+    }
+
+    function closeProfileMenu() {
+        const menu = document.getElementById('profile-menu');
+        if(menu) menu.classList.remove('active');
+    }
+
+    function toggleProfileMenu(event) {
+        if(event) event.stopPropagation();
+        const menu = document.getElementById('profile-menu');
+        if(menu) menu.classList.toggle('active');
+    }
+
+    function handleProfilePhotoInput(input) {
+        const file = input.files && input.files[0];
+        input.value = '';
+        if(!file) return;
+
+        if(!PROFILE_PHOTO_TYPES.includes(file.type)) {
+            alert('Format foto belum didukung. Gunakan JPG, PNG, atau WEBP.');
+            return;
+        }
+        if(file.size > PROFILE_PHOTO_MAX_BYTES) {
+            alert('Ukuran foto terlalu besar. Gunakan foto maksimal 5 MB.');
+            return;
+        }
+
+        const modal = document.getElementById('profile-crop-modal');
+        const img = document.getElementById('profile-crop-image');
+        const zoom = document.getElementById('profile-crop-zoom');
+        const preview = document.getElementById('profile-crop-preview');
+        if(!modal || !img) return;
+
+        if(profileCropState.objectUrl) URL.revokeObjectURL(profileCropState.objectUrl);
+        const objectUrl = URL.createObjectURL(file);
+        profileCropState = {
+            image: img,
+            objectUrl,
+            scale: 1,
+            minScale: 1,
+            x: 0,
+            y: 0,
+            dragging: false,
+            startX: 0,
+            startY: 0,
+            startImageX: 0,
+            startImageY: 0
+        };
+
+        img.onload = () => {
+            const stage = document.getElementById('profile-crop-stage');
+            const baseScale = Math.max(stage.clientWidth / img.naturalWidth, stage.clientHeight / img.naturalHeight);
+            profileCropState.minScale = baseScale;
+            profileCropState.scale = baseScale;
+            profileCropState.x = 0;
+            profileCropState.y = 0;
+            zoom.min = baseScale.toFixed(4);
+            zoom.max = (baseScale * 3).toFixed(4);
+            zoom.step = Math.max(baseScale / 100, 0.001).toFixed(4);
+            zoom.value = baseScale;
+            preview.style.display = 'none';
+            updateCropTransform();
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+        };
+        img.src = objectUrl;
+    }
+
+    function updateCropTransform() {
+        const img = profileCropState.image;
+        if(!img) return;
+        img.style.width = `${img.naturalWidth * profileCropState.scale}px`;
+        img.style.height = `${img.naturalHeight * profileCropState.scale}px`;
+        img.style.transform = `translate(calc(-50% + ${profileCropState.x}px), calc(-50% + ${profileCropState.y}px))`;
+        renderProfileCropPreview();
+    }
+
+    function clampCropPosition() {
+        const stage = document.getElementById('profile-crop-stage');
+        const img = profileCropState.image;
+        if(!stage || !img) return;
+        const renderedW = img.naturalWidth * profileCropState.scale;
+        const renderedH = img.naturalHeight * profileCropState.scale;
+        const maxX = Math.max(0, (renderedW - stage.clientWidth) / 2);
+        const maxY = Math.max(0, (renderedH - stage.clientHeight) / 2);
+        profileCropState.x = Math.max(-maxX, Math.min(maxX, profileCropState.x));
+        profileCropState.y = Math.max(-maxY, Math.min(maxY, profileCropState.y));
+    }
+
+    function renderProfileCropPreview() {
+        const stage = document.getElementById('profile-crop-stage');
+        const img = profileCropState.image;
+        const preview = document.getElementById('profile-crop-preview');
+        if(!stage || !img || !img.naturalWidth || !preview) return;
+
+        clampCropPosition();
+
+        const canvas = document.createElement('canvas');
+        const outputSize = 256;
+        canvas.width = outputSize;
+        canvas.height = outputSize;
+        const ctx = canvas.getContext('2d');
+
+        const scale = profileCropState.scale;
+        const renderedW = img.naturalWidth * scale;
+        const renderedH = img.naturalHeight * scale;
+        const stageSize = stage.clientWidth;
+        const imageLeft = (stageSize - renderedW) / 2 + profileCropState.x;
+        const imageTop = (stageSize - renderedH) / 2 + profileCropState.y;
+        const sourceX = Math.max(0, (0 - imageLeft) / scale);
+        const sourceY = Math.max(0, (0 - imageTop) / scale);
+        const sourceSize = stageSize / scale;
+
+        ctx.drawImage(img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, outputSize, outputSize);
+        preview.src = canvas.toDataURL('image/jpeg', 0.9);
+        preview.style.display = 'block';
+    }
+
+    function saveProfileCrop() {
+        const stage = document.getElementById('profile-crop-stage');
+        const img = profileCropState.image;
+        if(!stage || !img || !img.naturalWidth) return;
+
+        clampCropPosition();
+
+        const canvas = document.createElement('canvas');
+        const outputSize = 512;
+        canvas.width = outputSize;
+        canvas.height = outputSize;
+        const ctx = canvas.getContext('2d');
+
+        const scale = profileCropState.scale;
+        const renderedW = img.naturalWidth * scale;
+        const renderedH = img.naturalHeight * scale;
+        const stageSize = stage.clientWidth;
+        const imageLeft = (stageSize - renderedW) / 2 + profileCropState.x;
+        const imageTop = (stageSize - renderedH) / 2 + profileCropState.y;
+        const sourceX = Math.max(0, (0 - imageLeft) / scale);
+        const sourceY = Math.max(0, (0 - imageTop) / scale);
+        const sourceSize = stageSize / scale;
+
+        ctx.drawImage(img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, outputSize, outputSize);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+        if(!AppState.user) AppState.user = { name: 'Aulia', gender: 'L', isLoggedIn: true };
+        AppState.user.profilePhoto = dataUrl;
+        Storage.set('user', AppState.user);
+
+        closeProfileCrop();
+        navigate('profile');
+    }
+
+    function closeProfileCrop() {
+        const modal = document.getElementById('profile-crop-modal');
+        if(modal) {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        if(profileCropState.objectUrl) {
+            URL.revokeObjectURL(profileCropState.objectUrl);
+        }
+        profileCropState = {
+            image: null, objectUrl: null, scale: 1, minScale: 1,
+            x: 0, y: 0, dragging: false, startX: 0, startY: 0,
+            startImageX: 0, startImageY: 0
+        };
+    }
+
+    function setupProfileCropInteractions() {
+        const stage = document.getElementById('profile-crop-stage');
+        const img = document.getElementById('profile-crop-image');
+        const zoom = document.getElementById('profile-crop-zoom');
+        if(!stage || !img || !zoom || stage.dataset.bound === 'true') return;
+        stage.dataset.bound = 'true';
+
+        zoom.addEventListener('input', () => {
+            const oldScale = profileCropState.scale;
+            const newScale = Number(zoom.value);
+            if(!oldScale) return;
+            const ratio = newScale / oldScale;
+            profileCropState.x *= ratio;
+            profileCropState.y *= ratio;
+            profileCropState.scale = newScale;
+            clampCropPosition();
+            updateCropTransform();
+        });
+
+        const startDrag = (e) => {
+            if(!profileCropState.image) return;
+            profileCropState.dragging = true;
+            profileCropState.startX = e.clientX;
+            profileCropState.startY = e.clientY;
+            profileCropState.startImageX = profileCropState.x;
+            profileCropState.startImageY = profileCropState.y;
+            img.classList.add('dragging');
+            if(e.pointerId !== undefined) stage.setPointerCapture(e.pointerId);
+        };
+        const moveDrag = (e) => {
+            if(!profileCropState.dragging) return;
+            profileCropState.x = profileCropState.startImageX + (e.clientX - profileCropState.startX);
+            profileCropState.y = profileCropState.startImageY + (e.clientY - profileCropState.startY);
+            clampCropPosition();
+            updateCropTransform();
+        };
+        const endDrag = () => {
+            profileCropState.dragging = false;
+            img.classList.remove('dragging');
+        };
+
+        stage.addEventListener('pointerdown', startDrag);
+        stage.addEventListener('pointermove', moveDrag);
+        stage.addEventListener('pointerup', endDrag);
+        stage.addEventListener('pointercancel', endDrag);
+        stage.addEventListener('pointerleave', endDrag);
+    }
+
     let AppState = {
         user: Storage.get('user') || null,
         progress: Storage.get('progress') || {
@@ -448,8 +741,8 @@
 
     function navigate(viewId, params = null) {
         window.scrollTo(0, 0);
-        stopAudio();
         closeProfileMenu();
+        stopAudio();
         renderNavigation(viewId);
         
         mainContent.innerHTML = '';
@@ -492,12 +785,6 @@
         } else {
             document.getElementById('sidebar').style.display = window.innerWidth >= 1024 ? 'flex' : 'none';
             document.getElementById('bottom-nav').style.display = window.innerWidth < 1024 ? 'flex' : 'none';
-        }
-
-        const mobileTrigger = document.getElementById('mobile-profile-trigger');
-        if(mobileTrigger) {
-            mobileTrigger.style.display = (window.innerWidth < 1024 && !noNavScreens.includes(activeId) && activeId !== 'home') ? 'flex' : 'none';
-            renderMobileProfileTrigger();
         }
 
         const buildNav = (isSidebar) => NAV_ITEMS.map(item => `
@@ -792,8 +1079,16 @@
                     <div style="background:var(--primary-light); padding:4px 10px; border-radius:var(--rad-full); font-size:12px; font-weight:600; color:var(--primary);">
                         🔥 ${p.streak} Hari
                     </div>
-                    <div class="avatar" onclick="handleProfileAvatarClick(event)" role="button" tabindex="0" aria-label="Buka menu profil">
-                        ${renderAvatarContent(user, 'header')}
+                    <div class="profile-menu-wrap" onclick="event.stopPropagation();">
+                        <button class="profile-trigger" type="button" aria-label="Buka menu profil" aria-haspopup="true" aria-expanded="false" onclick="toggleProfileMenu(event)">
+                            ${avatarMarkup(user, 44)}
+                        </button>
+                        <div class="profile-menu" id="profile-menu">
+                            <button class="profile-menu-item" type="button" onclick="closeProfileMenu(); navigate('about');"><i class="ph-info"></i><span>Tentang</span></button>
+                            <button class="profile-menu-item" type="button" onclick="closeProfileMenu(); navigate('faq');"><i class="ph-question"></i><span>FAQ</span></button>
+                            <button class="profile-menu-item" type="button" onclick="closeProfileMenu(); navigate('profile');"><i class="ph-user"></i><span>Profil</span></button>
+                            <button class="profile-menu-item" type="button" onclick="closeProfileMenu(); navigate('settings');"><i class="ph-gear"></i><span>Pengaturan</span></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1092,331 +1387,35 @@
         `;
     }
 
-    function escapeHtml(value) {
-        return String(value ?? '').replace(/[&<>"']/g, char => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-        }[char]));
-    }
-
-    function renderAvatarContent(user, context = 'header') {
-        if(user && user.profileImage) {
-            return `<img src="${user.profileImage}" alt="Foto profil ${escapeHtml(user.name || 'Pengguna')}">`;
-        }
-        return escapeHtml((user && user.name ? user.name.charAt(0) : 'P').toUpperCase());
-    }
-
-    let profileCropState = {
-        image: null,
-        scale: 1,
-        baseScale: 1,
-        x: 0,
-        y: 0,
-        dragging: false,
-        startX: 0,
-        startY: 0,
-        originX: 0,
-        originY: 0
-    };
-
-    function renderMobileProfileTrigger() {
-        const trigger = document.getElementById('mobile-profile-trigger');
-        if(!trigger) return;
-        const user = AppState.user || { name: 'P' };
-        trigger.innerHTML = renderAvatarContent(user, 'mobile');
-        trigger.style.display = 'flex';
-    }
-
-    function renderMobileProfileMenu() {
-        const root = document.getElementById('mobile-profile-menu-root');
-        if(!root) return;
-        const user = AppState.user || { name: 'Pengguna' };
-        root.innerHTML = `
-            <div class="profile-menu-backdrop" onclick="closeProfileMenu()" aria-hidden="true"></div>
-            <div class="profile-menu" role="menu" aria-label="Menu profil">
-                <div class="profile-menu-header">
-                    <div class="profile-menu-avatar">${renderAvatarContent(user, 'menu')}</div>
-                    <div style="min-width:0;">
-                        <div style="font-weight:700; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(user.name || 'Pengguna')}</div>
-                        <div style="font-size:11px; color:var(--text-muted);">Menu Profil</div>
-                    </div>
-                </div>
-                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('about')"><i class="ph-info"></i><span>Tentang</span></button>
-                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('faq')"><i class="ph-question"></i><span>FAQ</span></button>
-                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('profile')"><i class="ph-user"></i><span>Profil</span></button>
-                <button class="profile-menu-item" role="menuitem" onclick="navigateFromProfileMenu('settings')"><i class="ph-gear"></i><span>Pengaturan</span></button>
-            </div>
-        `;
-    }
-
-    function handleProfileAvatarClick(event) {
-        if(window.innerWidth < 1024) toggleProfileMenu(event);
-        else navigate('profile');
-    }
-
-    function toggleProfileMenu(event) {
-        if(event) event.stopPropagation();
-        const root = document.getElementById('mobile-profile-menu-root');
-        if(!root) return;
-        if(root.innerHTML.trim()) {
-            closeProfileMenu();
-        } else {
-            renderMobileProfileMenu();
-        }
-    }
-
-    function closeProfileMenu() {
-        const root = document.getElementById('mobile-profile-menu-root');
-        if(root) root.innerHTML = '';
-    }
-
-    function navigateFromProfileMenu(viewId) {
-        closeProfileMenu();
-        navigate(viewId);
-    }
-
-    function initProfilePhotoUpload(container) {
-        const input = container.querySelector('#profile-photo-input');
-        if(!input) return;
-
-        input.addEventListener('change', () => {
-            const file = input.files && input.files[0];
-            if(!file) return;
-
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if(!allowedTypes.includes(file.type)) {
-                alert('Format foto belum didukung. Gunakan JPG, PNG, atau WEBP.');
-                input.value = '';
-                return;
-            }
-
-            if(file.size > 5 * 1024 * 1024) {
-                alert('Ukuran foto terlalu besar. Gunakan foto maksimal 5 MB.');
-                input.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = () => openProfileCrop(String(reader.result));
-            reader.onerror = () => alert('Foto tidak dapat dibaca. Silakan pilih foto lain.');
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function openProfileCrop(dataUrl) {
-        const modal = document.getElementById('profile-crop-modal');
-        const area = document.getElementById('profile-crop-area');
-        const zoom = document.getElementById('profile-crop-zoom');
-        if(!modal || !area || !zoom) return;
-
-        const img = new Image();
-        img.onload = () => {
-            profileCropState.image = img;
-            profileCropState.scale = 1;
-            profileCropState.x = 0;
-            profileCropState.y = 0;
-
-            area.innerHTML = '';
-            const imageEl = document.createElement('img');
-            imageEl.className = 'crop-image';
-            imageEl.alt = 'Crop foto profil';
-            imageEl.draggable = false;
-            imageEl.src = dataUrl;
-            area.appendChild(imageEl);
-
-            profileCropState.imageEl = imageEl;
-            modal.style.display = 'flex';
-            modal.setAttribute('aria-hidden', 'false');
-            zoom.value = '1';
-
-            requestAnimationFrame(() => {
-                const rect = area.getBoundingClientRect();
-                profileCropState.baseScale = Math.max(rect.width / img.naturalWidth, rect.height / img.naturalHeight);
-                profileCropState.scale = profileCropState.baseScale;
-                profileCropState.x = (rect.width - img.naturalWidth * profileCropState.scale) / 2;
-                profileCropState.y = (rect.height - img.naturalHeight * profileCropState.scale) / 2;
-                applyProfileCropTransform();
-            });
-        };
-        img.onerror = () => alert('Foto tidak dapat diproses. Silakan pilih foto lain.');
-        img.src = dataUrl;
-    }
-
-    function applyProfileCropTransform() {
-        const el = profileCropState.imageEl;
-        if(!el) return;
-        el.style.width = `${profileCropState.image.naturalWidth}px`;
-        el.style.height = `${profileCropState.image.naturalHeight}px`;
-        el.style.transform = `translate(${profileCropState.x}px, ${profileCropState.y}px) scale(${profileCropState.scale})`;
-    }
-
-    function setProfileCropZoom(value) {
-        const oldScale = profileCropState.scale;
-        const newScale = profileCropState.baseScale * Number(value);
-        const area = document.getElementById('profile-crop-area');
-        if(!area || !oldScale || !newScale) return;
-
-        const rect = area.getBoundingClientRect();
-        const cx = rect.width / 2;
-        const cy = rect.height / 2;
-        profileCropState.x = cx - (cx - profileCropState.x) * (newScale / oldScale);
-        profileCropState.y = cy - (cy - profileCropState.y) * (newScale / oldScale);
-        profileCropState.scale = newScale;
-        clampProfileCropPosition();
-        applyProfileCropTransform();
-    }
-
-    function clampProfileCropPosition() {
-        const area = document.getElementById('profile-crop-area');
-        if(!area || !profileCropState.image) return;
-        const rect = area.getBoundingClientRect();
-        const width = profileCropState.image.naturalWidth * profileCropState.scale;
-        const height = profileCropState.image.naturalHeight * profileCropState.scale;
-        profileCropState.x = Math.min(0, Math.max(rect.width - width, profileCropState.x));
-        profileCropState.y = Math.min(0, Math.max(rect.height - height, profileCropState.y));
-    }
-
-    function saveProfileCrop() {
-        const area = document.getElementById('profile-crop-area');
-        if(!area || !profileCropState.image) return;
-
-        clampProfileCropPosition();
-        const size = 512;
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
-
-        const rect = area.getBoundingClientRect();
-        const sourceScale = profileCropState.scale;
-        const sourceX = -profileCropState.x / sourceScale;
-        const sourceY = -profileCropState.y / sourceScale;
-        const sourceSize = rect.width / sourceScale;
-
-        ctx.drawImage(
-            profileCropState.image,
-            sourceX,
-            sourceY,
-            sourceSize,
-            sourceSize,
-            0,
-            0,
-            size,
-            size
-        );
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.86);
-        if(!AppState.user) AppState.user = { name: 'Aulia', gender: 'L', isLoggedIn: true };
-        AppState.user.profileImage = dataUrl;
-        Storage.set('user', AppState.user);
-
-        closeProfileCrop();
-        renderMobileProfileTrigger();
-        renderMobileProfileMenu();
-        navigate('profile');
-    }
-
-    function closeProfileCrop() {
-        const modal = document.getElementById('profile-crop-modal');
-        if(modal) {
-            modal.style.display = 'none';
-            modal.setAttribute('aria-hidden', 'true');
-        }
-        profileCropState.image = null;
-        profileCropState.imageEl = null;
-    }
-
-    function bindProfileCropInteractions() {
-        const area = document.getElementById('profile-crop-area');
-        const zoom = document.getElementById('profile-crop-zoom');
-        if(!area || !zoom) return;
-
-        zoom.oninput = () => setProfileCropZoom(zoom.value);
-
-        const startDrag = (clientX, clientY) => {
-            profileCropState.dragging = true;
-            profileCropState.startX = clientX;
-            profileCropState.startY = clientY;
-            profileCropState.originX = profileCropState.x;
-            profileCropState.originY = profileCropState.y;
-            profileCropState.imageEl?.classList.add('dragging');
-        };
-
-        const moveDrag = (clientX, clientY) => {
-            if(!profileCropState.dragging) return;
-            profileCropState.x = profileCropState.originX + (clientX - profileCropState.startX);
-            profileCropState.y = profileCropState.originY + (clientY - profileCropState.startY);
-            clampProfileCropPosition();
-            applyProfileCropTransform();
-        };
-
-        const endDrag = () => {
-            profileCropState.dragging = false;
-            profileCropState.imageEl?.classList.remove('dragging');
-        };
-
-        area.onpointerdown = (e) => {
-            e.preventDefault();
-            area.setPointerCapture?.(e.pointerId);
-            startDrag(e.clientX, e.clientY);
-        };
-        area.onpointermove = (e) => {
-            e.preventDefault();
-            moveDrag(e.clientX, e.clientY);
-        };
-        area.onpointerup = endDrag;
-        area.onpointercancel = endDrag;
-        area.onpointerleave = () => {
-            if(profileCropState.dragging) endDrag();
-        };
-    }
-
     function renderProfile() {
         const u = AppState.user || { name: 'Aulia', gender: 'L' };
         const lvl = calculateLevel();
-        const photo = u.profileImage || '';
+        const photo = getProfilePhoto();
         return `
             <div style="text-align:center; padding:20px 0;">
-                <div class="profile-photo-preview" id="profile-photo-preview">
-                    ${photo ? `<img src="${photo}" alt="Foto profil ${escapeHtml(u.name)}">` : `<div class="profile-photo-placeholder">${escapeHtml(u.name.charAt(0).toUpperCase())}</div>`}
+                <div id="profile-photo-display" style="width:96px; height:96px; margin:0 auto 10px;">
+                    ${photo
+                        ? `<img class="profile-photo" src="${photo}" alt="Foto profil" style="width:96px;height:96px;">`
+                        : `<div style="width:96px;height:96px;border-radius:50%;background:var(--primary);color:white;font-size:36px;display:flex;align-items:center;justify-content:center;">${u.name.charAt(0).toUpperCase()}</div>`
+                    }
                 </div>
-                <h2>${escapeHtml(u.name)}</h2>
+                <h2>${u.name}</h2>
                 <p style="font-size:13px;">Level ${lvl.level} • ${lvl.name}</p>
-                <div class="profile-editor">
-                    <input type="file" id="profile-photo-input" accept="image/jpeg,image/png,image/webp" hidden>
-                    <button class="btn btn-outline" style="width:auto; padding:9px 16px;" onclick="document.getElementById('profile-photo-input').click()">
-                        <i class="ph-camera"></i> ${photo ? 'Ubah Foto' : 'Tambah Foto'}
-                    </button>
-                    <p style="font-size:12px; margin:8px 0 0;">JPG, PNG, atau WEBP • Maksimal 5 MB</p>
-                </div>
+                <input type="file" id="profile-photo-input" accept="image/jpeg,image/png,image/webp" hidden onchange="handleProfilePhotoInput(this)">
+                <button class="btn btn-outline" type="button" style="width:auto; padding:8px 16px; margin-top:4px;" onclick="document.getElementById('profile-photo-input').click()">
+                    <i class="ph-camera"></i> Ubah Foto
+                </button>
+                <p style="font-size:11px; margin:8px 0 0;">JPG, PNG, atau WEBP • Maks. 5 MB • Crop 1:1</p>
             </div>
             <div class="card">
                 <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px;">
-                    <span>Nama</span> <b>${escapeHtml(u.name)}</b>
+                    <span>Nama</span> <b>${u.name}</b>
                 </div>
                 <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;">
                     <span>Total XP</span> <b style="color:var(--primary);">${AppState.progress.xp} XP</b>
                 </div>
             </div>
             <button class="btn btn-outline" style="color:var(--error); border-color:var(--error); margin-top:20px;" onclick="doLogout()"><i class="ph-sign-out"></i> Keluar</button>
-
-            <div id="profile-crop-modal" class="crop-modal" style="display:none;" aria-hidden="true">
-                <div class="crop-dialog" role="dialog" aria-modal="true" aria-labelledby="crop-title">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <h3 id="crop-title">Crop Foto Profil 1:1</h3>
-                        <button type="button" onclick="closeProfileCrop()" aria-label="Tutup" style="font-size:22px; color:var(--text-muted);"><i class="ph-x"></i></button>
-                    </div>
-                    <p style="font-size:13px; margin-bottom:12px;">Geser foto dan atur zoom untuk menentukan bagian yang digunakan.</p>
-                    <div id="profile-crop-area" class="crop-area"></div>
-                    <div class="crop-controls">
-                        <label for="profile-crop-zoom">Zoom</label>
-                        <input id="profile-crop-zoom" type="range" min="1" max="3" step="0.01" value="1">
-                    </div>
-                    <div class="profile-editor-actions">
-                        <button type="button" class="btn btn-outline" style="width:auto; padding:9px 16px;" onclick="closeProfileCrop()">Batal</button>
-                        <button type="button" class="btn btn-primary" style="width:auto; padding:9px 16px;" onclick="saveProfileCrop()"><i class="ph-check"></i> Simpan</button>
-                    </div>
-                </div>
-            </div>
         `;
     }
 
@@ -1490,6 +1489,21 @@
         document.getElementById('material-list-container').innerHTML = buildMaterialCards(activeTab, searchQ);
     };
 
+    document.addEventListener('click', (event) => {
+        const menu = document.getElementById('profile-menu');
+        const wrap = event.target.closest('.profile-menu-wrap');
+        if(menu && !wrap) closeProfileMenu();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if(event.key === 'Escape') {
+            closeProfileMenu();
+            closeProfileCrop();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', setupProfileCropInteractions);
+
     function attachViewListeners(viewId, container, params) {
         if(viewId === 'identity') {
             const btnSave = container.querySelector('#btn-save-identity');
@@ -1509,10 +1523,6 @@
         }
         if(viewId === 'materials') {
             container.querySelector('#material-list-container').innerHTML = buildMaterialCards('all', '');
-        }
-        if(viewId === 'profile') {
-            initProfilePhotoUpload(container);
-            bindProfileCropInteractions();
         }
     }
 
