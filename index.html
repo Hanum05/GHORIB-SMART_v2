@@ -1135,7 +1135,7 @@
         audio: null,
         gifTimer: null,
         audioEnded: false,
-        gifEnded: false,
+        gifFinished: false,
         closing: false,
         fallbackInteractionBound: false,
         fallbackHandler: null
@@ -1149,17 +1149,11 @@
         return document.getElementById('mascot-welcome-gif');
     }
 
-    function cleanupMascotWelcome() {
-        if(mascotWelcome.gifTimer) {
-            clearTimeout(mascotWelcome.gifTimer);
-            mascotWelcome.gifTimer = null;
-        }
+    function clearMascotWelcomeListeners() {
         if(mascotWelcome.audio) {
-            mascotWelcome.audio.pause();
             mascotWelcome.audio.onended = null;
             mascotWelcome.audio.onerror = null;
         }
-        mascotWelcome.audio = null;
         if(mascotWelcome.fallbackHandler) {
             ['pointerdown', 'touchstart', 'keydown'].forEach(eventName => {
                 document.removeEventListener(eventName, mascotWelcome.fallbackHandler);
@@ -1167,11 +1161,28 @@
             mascotWelcome.fallbackHandler = null;
         }
         mascotWelcome.fallbackInteractionBound = false;
+    }
+
+    function cleanupMascotWelcome() {
+        if(mascotWelcome.gifTimer) {
+            clearTimeout(mascotWelcome.gifTimer);
+            mascotWelcome.gifTimer = null;
+        }
+
+        clearMascotWelcomeListeners();
+
+        if(mascotWelcome.audio) {
+            mascotWelcome.audio.pause();
+            mascotWelcome.audio.currentTime = 0;
+        }
+        mascotWelcome.audio = null;
+
         const gif = getMascotWelcomeGif();
         if(gif) gif.removeAttribute('src');
+
         mascotWelcome.active = false;
         mascotWelcome.audioEnded = false;
-        mascotWelcome.gifEnded = false;
+        mascotWelcome.gifFinished = false;
         mascotWelcome.closing = false;
 
         const overlay = getMascotWelcomeOverlay();
@@ -1184,21 +1195,49 @@
 
     function finishMascotWelcomeIfReady() {
         if(!mascotWelcome.active || mascotWelcome.closing) return;
-        if(!mascotWelcome.audioEnded || !mascotWelcome.gifEnded) return;
 
-        mascotWelcome.closing = true;
-        const overlay = getMascotWelcomeOverlay();
-        if(!overlay) {
-            cleanupMascotWelcome();
-            return;
+        // Audio ending only records audioFinished. It NEVER controls the
+        // dimming state. The GIF is the sole controller of that state.
+        if(mascotWelcome.gifFinished) {
+            const overlay = getMascotWelcomeOverlay();
+            if(overlay) {
+                overlay.classList.remove('active');
+                overlay.classList.add('closing');
+                overlay.setAttribute('aria-hidden', 'true');
+                overlay.style.pointerEvents = 'none';
+            }
+
+            mascotWelcome.closing = true;
+
+            // The GIF is removed after the short visual exit, while audio is
+            // deliberately left untouched if it is still playing.
+            setTimeout(() => {
+                const gif = getMascotWelcomeGif();
+                if(gif) gif.removeAttribute('src');
+
+                if(mascotWelcome.audioEnded) {
+                    cleanupMascotWelcome();
+                } else {
+                    // The welcome is visually finished, but the audio may
+                    // still be playing. Keep only the audio state alive.
+                    clearMascotWelcomeListeners();
+                    mascotWelcome.active = false;
+                    mascotWelcome.closing = false;
+                    mascotWelcome.gifFinished = true;
+
+                    const finalAudio = mascotWelcome.audio;
+                    if(finalAudio && !finalAudio.ended) {
+                        finalAudio.onended = () => {
+                            mascotWelcome.audioEnded = true;
+                            cleanupMascotWelcome();
+                        };
+                    } else {
+                        mascotWelcome.audioEnded = true;
+                        cleanupMascotWelcome();
+                    }
+                }
+            }, 300);
         }
-
-        overlay.classList.remove('active');
-        overlay.classList.add('closing');
-
-        setTimeout(() => {
-            cleanupMascotWelcome();
-        }, 300);
     }
 
     function bindMascotAutoplayFallback() {
@@ -1207,11 +1246,11 @@
 
         const tryStartAudio = () => {
             const audio = mascotWelcome.audio;
-            if(!audio || !mascotWelcome.active || mascotWelcome.closing || !audio.paused) return;
-            mascotWelcome.audioEnded = false;
+            if(!audio || !mascotWelcome.active || mascotWelcome.closing || !audio.paused || audio.ended) return;
+
             audio.play().catch(() => {
-                mascotWelcome.audioEnded = true;
-                finishMascotWelcomeIfReady();
+                // If the browser still refuses playback after a user gesture,
+                // do not let that error affect GIF timing or the Home overlay.
             });
         };
 
@@ -1221,97 +1260,164 @@
         });
     }
 
-    function getGifDurationMs(arrayBuffer) {
+    function parseGifMetadata(arrayBuffer) {
         try {
             const bytes = new Uint8Array(arrayBuffer);
-            if(bytes.length < 13 || bytes[0] !== 0x47 || bytes[1] !== 0x49 || bytes[2] !== 0x46) return null;
+            if(bytes.length < 13 ||
+               bytes[0] !== 0x47 || bytes[1] !== 0x49 || bytes[2] !== 0x46) {
+                return null;
+            }
 
             let pos = 6;
             const packed = bytes[10];
             pos += 7;
 
             if(packed & 0x80) {
-                pos += 3 * (1 << ((packed & 0x07) + 1));
+                const globalColorTableSize = 3 * (1 << ((packed & 0x07) + 1));
+                if(pos + globalColorTableSize > bytes.length) return null;
+                pos += globalColorTableSize;
             }
 
-            let duration = 0;
+            let frameDuration = 0;
             let pendingDelay = 0;
+            let frameCount = 0;
+            let loopCount = null;
 
             while(pos < bytes.length) {
                 const block = bytes[pos++];
-                if(block === 0x3B) break;
+
+                if(block === 0x3B) break; // GIF trailer
 
                 if(block === 0x21) {
+                    if(pos >= bytes.length) return null;
                     const label = bytes[pos++];
-                    if(label === 0xF9) {
+
+                    if(label === 0xF9) { // Graphic Control Extension
+                        if(pos >= bytes.length) return null;
                         const blockSize = bytes[pos++];
-                        if(blockSize >= 4) {
-                            pos += 1;
-                            const delay = bytes[pos] | (bytes[pos + 1] << 8);
-                            pendingDelay = delay * 10;
-                            pos += 2;
-                            pos += 1;
-                        } else {
-                            pos += blockSize;
-                        }
+                        if(blockSize < 4 || pos + blockSize > bytes.length) return null;
+
+                        pos += 1; // packed fields
+                        const delay = bytes[pos] | (bytes[pos + 1] << 8);
+                        pendingDelay = delay * 10;
+                        pos += 2;
+                        pos += 1; // transparent color index
+                        pos += blockSize - 4;
+
+                        if(pos >= bytes.length) return null;
                         if(bytes[pos] === 0) pos++;
+                    } else if(label === 0xFF) { // Application Extension
+                        if(pos >= bytes.length) return null;
+                        const blockSize = bytes[pos++];
+                        if(pos + blockSize > bytes.length) return null;
+
+                        let appId = '';
+                        for(let i = 0; i < blockSize; i++) {
+                            appId += String.fromCharCode(bytes[pos + i]);
+                        }
+                        pos += blockSize;
+
+                        const subBlocks = [];
+                        while(pos < bytes.length) {
+                            const size = bytes[pos++];
+                            if(size === 0) break;
+                            if(pos + size > bytes.length) return null;
+                            subBlocks.push(bytes.slice(pos, pos + size));
+                            pos += size;
+                        }
+
+                        if(appId.indexOf('NETSCAPE') === 0 || appId.indexOf('ANIMEXTS') === 0) {
+                            for(const data of subBlocks) {
+                                if(data.length >= 3 && data[0] === 1) {
+                                    loopCount = data[1] | (data[2] << 8);
+                                    break;
+                                }
+                            }
+                        }
                     } else {
                         while(pos < bytes.length) {
                             const size = bytes[pos++];
                             if(size === 0) break;
+                            if(pos + size > bytes.length) return null;
                             pos += size;
                         }
                     }
-                } else if(block === 0x2C) {
-                    if(pos + 9 > bytes.length) break;
+                } else if(block === 0x2C) { // Image Descriptor
+                    if(pos + 9 > bytes.length) return null;
                     const imagePacked = bytes[pos + 8];
                     pos += 9;
 
                     if(imagePacked & 0x80) {
-                        pos += 3 * (1 << ((imagePacked & 0x07) + 1));
+                        const localColorTableSize = 3 * (1 << ((imagePacked & 0x07) + 1));
+                        if(pos + localColorTableSize > bytes.length) return null;
+                        pos += localColorTableSize;
                     }
 
-                    pos += 1;
+                    if(pos >= bytes.length) return null;
+                    pos += 1; // LZW minimum code size
+
                     while(pos < bytes.length) {
                         const size = bytes[pos++];
                         if(size === 0) break;
+                        if(pos + size > bytes.length) return null;
                         pos += size;
                     }
 
-                    duration += pendingDelay;
+                    frameCount++;
+                    frameDuration += pendingDelay;
                     pendingDelay = 0;
                 } else {
-                    break;
+                    return null;
                 }
             }
 
-            return duration > 0 ? duration : null;
+            if(frameCount === 0 || frameDuration <= 0) return null;
+
+            return {
+                durationMs: frameDuration,
+                frameCount,
+                // GIF loop count 0 means infinite looping. A positive value
+                // means the animation repeats that many additional times.
+                loopCount,
+                infiniteLoop: loopCount === 0
+            };
         } catch(error) {
             return null;
         }
     }
 
-    async function resolveMascotGifDuration() {
+    async function resolveMascotGifMetadata() {
         try {
             const response = await fetch('sambutan maskot.gif', { cache: 'no-store' });
             if(!response.ok) throw new Error('GIF tidak dapat dimuat.');
-            return getGifDurationMs(await response.arrayBuffer());
+            return parseGifMetadata(await response.arrayBuffer());
         } catch(error) {
+            console.warn('Durasi GIF sambutan tidak dapat dibaca:', error);
             return null;
         }
     }
 
-    async function showMascotWelcome() {
+    async function showMascotWelcome(homeView = null) {
         if(mascotWelcome.shownThisLoad || mascotWelcome.active) return;
-        mascotWelcome.shownThisLoad = true;
 
         const overlay = getMascotWelcomeOverlay();
         const gif = getMascotWelcomeGif();
         if(!overlay || !gif) return;
 
-        cleanupMascotWelcome();
         mascotWelcome.shownThisLoad = true;
-        mascotWelcome.active = true;
+
+        // Read the actual GIF timing BEFORE starting either medium. This
+        // prevents network/parsing delay from shifting the GIF timer.
+        const gifMetadata = await resolveMascotGifMetadata();
+        if(homeView && !mainContent.contains(homeView)) {
+            mascotWelcome.shownThisLoad = false;
+            return;
+        }
+        if(!gifMetadata) {
+            mascotWelcome.shownThisLoad = false;
+            console.warn('Sambutan maskot dibatalkan karena metadata GIF tidak dapat ditentukan secara aman.');
+            return;
+        }
 
         overlay.classList.remove('closing');
         overlay.classList.add('active');
@@ -1321,41 +1427,69 @@
         const gifSource = gif.getAttribute('data-src') || 'sambutan maskot.gif';
         gif.removeAttribute('src');
         void gif.offsetWidth;
-        gif.src = gifSource;
 
         const audio = new Audio('sambutan audio.mp3');
         audio.preload = 'auto';
         mascotWelcome.audio = audio;
+        mascotWelcome.active = true;
+        mascotWelcome.audioEnded = false;
+        mascotWelcome.gifFinished = false;
+        mascotWelcome.closing = false;
 
         audio.onended = () => {
             mascotWelcome.audioEnded = true;
-            finishMascotWelcomeIfReady();
+            // Audio ending NEVER removes the dimming. The GIF owns that state.
+            if(mascotWelcome.gifFinished && !mascotWelcome.active) {
+                cleanupMascotWelcome();
+            }
         };
+
         audio.onerror = () => {
+            // An audio load/playback error is not a GIF completion signal.
+            // Treat audio as unavailable so it cannot keep resources alive,
+            // while GIF timing remains authoritative for the overlay.
             mascotWelcome.audioEnded = true;
-            finishMascotWelcomeIfReady();
+            if(mascotWelcome.gifFinished && !mascotWelcome.active) {
+                cleanupMascotWelcome();
+            }
         };
 
-        const durationPromise = resolveMascotGifDuration();
-        const playPromise = audio.play();
-        if(playPromise) {
-            playPromise.catch(() => {
-                /* Autoplay blocked: keep the GIF running and allow the
-                   first user interaction to start the same audio instance. */
-                mascotWelcome.audioEnded = true;
-                finishMascotWelcomeIfReady();
-            });
+        // Assign the GIF and start both media in the same synchronous turn.
+        gif.src = gifSource;
+        const gifStartTime = performance.now();
+        audio.play().catch(() => {
+            bindMascotAutoplayFallback();
+        });
+
+        // The parsed GIF duration is authoritative. For a finite looping GIF,
+        // include all configured repeats. An infinite GIF has no natural end,
+        // so do not invent a hardcoded timeout that would cut it off.
+        let totalGifDuration = gifMetadata.durationMs;
+        if(gifMetadata.loopCount !== null && gifMetadata.loopCount > 0) {
+            totalGifDuration *= (gifMetadata.loopCount + 1);
         }
 
-        let gifDuration = await durationPromise;
-        if(!gifDuration || gifDuration < 100) {
-            gifDuration = 3000;
+        if(gifMetadata.infiniteLoop) {
+            // There is no natural GIF completion point. Keep the GIF/overlay
+            // intact rather than cutting the animation at an arbitrary time.
+            console.warn('sambutan maskot.gif dikonfigurasi sebagai infinite loop; tidak ada timer GIF buatan.');
+            bindMascotAutoplayFallback();
+            return;
         }
+
+        // Compensate only for the tiny synchronous scheduling interval between
+        // assigning the GIF source and starting the timer; never use a guessed
+        // duration.
+        const elapsed = performance.now() - gifStartTime;
+        const remaining = Math.max(0, totalGifDuration - elapsed);
 
         mascotWelcome.gifTimer = setTimeout(() => {
-            mascotWelcome.gifEnded = true;
+            mascotWelcome.gifFinished = true;
+
+            // GIF completion immediately restores the Home view. The audio is
+            // intentionally NOT paused, reset, or otherwise interrupted.
             finishMascotWelcomeIfReady();
-        }, gifDuration);
+        }, remaining);
 
         bindMascotAutoplayFallback();
     }
@@ -1430,7 +1564,7 @@
             attachViewListeners(viewId, viewWrapper, params);
 
             if(viewId === 'home') {
-                requestAnimationFrame(() => showMascotWelcome());
+                requestAnimationFrame(() => showMascotWelcome(viewWrapper));
             }
         }
     }
