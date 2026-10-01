@@ -271,9 +271,9 @@
             inset: 0;
             z-index: 180;
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
-            padding: 20px;
+            padding: 0;
             background: rgba(0, 0, 0, 0.45);
             opacity: 0;
             visibility: hidden;
@@ -297,7 +297,7 @@
             height: auto;
             max-height: 90vh;
             object-fit: contain;
-            object-position: center;
+            object-position: bottom center;
             border: 0;
             border-radius: 0;
             background: transparent;
@@ -305,12 +305,18 @@
             outline: none;
             flex: 0 1 auto;
         }
-        @media (max-width: 1023px) {
-            #mascot-welcome-overlay { padding: 12px; }
+        @media (max-width: 767px) {
             #mascot-welcome-gif {
-                width: 90vw;
+                width: 50vw;
                 max-width: 100%;
-                max-height: 88vh;
+                max-height: 75vh;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+            #mascot-welcome-gif {
+                width: 45vw;
+                max-width: 100%;
+                max-height: 80vh;
             }
         }
 
@@ -1129,13 +1135,17 @@
     };
 
     /* --- HOME MASCOT WELCOME STATE --- */
+    const MASCOT_GIF_DURATION_MS = 14270;
+    const MASCOT_GIF_TOLERANCE_MS = 120;
+    const MASCOT_FADE_MS = 300;
+
     let mascotWelcome = {
         shownThisLoad: false,
         active: false,
         audio: null,
         gifTimer: null,
         audioEnded: false,
-        gifEnded: false,
+        gifFinished: false,
         closing: false,
         fallbackInteractionBound: false,
         fallbackHandler: null
@@ -1149,29 +1159,35 @@
         return document.getElementById('mascot-welcome-gif');
     }
 
+    function removeMascotFallbackListener() {
+        if(!mascotWelcome.fallbackHandler) return;
+        ['pointerdown', 'touchstart', 'keydown'].forEach(eventName => {
+            document.removeEventListener(eventName, mascotWelcome.fallbackHandler);
+        });
+        mascotWelcome.fallbackHandler = null;
+        mascotWelcome.fallbackInteractionBound = false;
+    }
+
     function cleanupMascotWelcome() {
         if(mascotWelcome.gifTimer) {
             clearTimeout(mascotWelcome.gifTimer);
             mascotWelcome.gifTimer = null;
         }
+
+        removeMascotFallbackListener();
+
         if(mascotWelcome.audio) {
-            mascotWelcome.audio.pause();
             mascotWelcome.audio.onended = null;
             mascotWelcome.audio.onerror = null;
+            mascotWelcome.audio = null;
         }
-        mascotWelcome.audio = null;
-        if(mascotWelcome.fallbackHandler) {
-            ['pointerdown', 'touchstart', 'keydown'].forEach(eventName => {
-                document.removeEventListener(eventName, mascotWelcome.fallbackHandler);
-            });
-            mascotWelcome.fallbackHandler = null;
-        }
-        mascotWelcome.fallbackInteractionBound = false;
+
         const gif = getMascotWelcomeGif();
         if(gif) gif.removeAttribute('src');
+
         mascotWelcome.active = false;
         mascotWelcome.audioEnded = false;
-        mascotWelcome.gifEnded = false;
+        mascotWelcome.gifFinished = false;
         mascotWelcome.closing = false;
 
         const overlay = getMascotWelcomeOverlay();
@@ -1182,23 +1198,38 @@
         }
     }
 
-    function finishMascotWelcomeIfReady() {
-        if(!mascotWelcome.active || mascotWelcome.closing) return;
-        if(!mascotWelcome.audioEnded || !mascotWelcome.gifEnded) return;
+    function finishMascotGif() {
+        if(!mascotWelcome.active || mascotWelcome.gifFinished || mascotWelcome.closing) return;
 
+        mascotWelcome.gifFinished = true;
         mascotWelcome.closing = true;
+
         const overlay = getMascotWelcomeOverlay();
-        if(!overlay) {
-            cleanupMascotWelcome();
-            return;
+        const gif = getMascotWelcomeGif();
+
+        if(gif) {
+            gif.style.opacity = '0';
+            gif.style.transition = `opacity ${MASCOT_FADE_MS}ms ease`;
+        }
+        if(overlay) {
+            overlay.classList.remove('active');
+            overlay.classList.add('closing');
+            overlay.setAttribute('aria-hidden', 'true');
+            overlay.style.pointerEvents = 'none';
         }
 
-        overlay.classList.remove('active');
-        overlay.classList.add('closing');
-
+        // GIF/overlay end independently. DO NOT pause or stop the audio here.
         setTimeout(() => {
-            cleanupMascotWelcome();
-        }, 300);
+            if(gif) {
+                gif.removeAttribute('src');
+                gif.style.opacity = '';
+                gif.style.transition = '';
+            }
+            if(overlay) overlay.classList.remove('closing');
+            mascotWelcome.active = false;
+            mascotWelcome.closing = false;
+            mascotWelcome.gifTimer = null;
+        }, MASCOT_FADE_MS);
     }
 
     function bindMascotAutoplayFallback() {
@@ -1207,12 +1238,14 @@
 
         const tryStartAudio = () => {
             const audio = mascotWelcome.audio;
-            if(!audio || !mascotWelcome.active || mascotWelcome.closing || !audio.paused) return;
-            mascotWelcome.audioEnded = false;
-            audio.play().catch(() => {
-                mascotWelcome.audioEnded = true;
-                finishMascotWelcomeIfReady();
-            });
+            if(!audio || mascotWelcome.audioEnded || !audio.paused) return;
+
+            const playPromise = audio.play();
+            if(playPromise) {
+                playPromise.catch(() => {
+                    // Browser may continue to block autoplay. Do not loop or create another audio instance.
+                });
+            }
         };
 
         mascotWelcome.fallbackHandler = tryStartAudio;
@@ -1221,143 +1254,61 @@
         });
     }
 
-    function getGifDurationMs(arrayBuffer) {
-        try {
-            const bytes = new Uint8Array(arrayBuffer);
-            if(bytes.length < 13 || bytes[0] !== 0x47 || bytes[1] !== 0x49 || bytes[2] !== 0x46) return null;
-
-            let pos = 6;
-            const packed = bytes[10];
-            pos += 7;
-
-            if(packed & 0x80) {
-                pos += 3 * (1 << ((packed & 0x07) + 1));
-            }
-
-            let duration = 0;
-            let pendingDelay = 0;
-
-            while(pos < bytes.length) {
-                const block = bytes[pos++];
-                if(block === 0x3B) break;
-
-                if(block === 0x21) {
-                    const label = bytes[pos++];
-                    if(label === 0xF9) {
-                        const blockSize = bytes[pos++];
-                        if(blockSize >= 4) {
-                            pos += 1;
-                            const delay = bytes[pos] | (bytes[pos + 1] << 8);
-                            pendingDelay = delay * 10;
-                            pos += 2;
-                            pos += 1;
-                        } else {
-                            pos += blockSize;
-                        }
-                        if(bytes[pos] === 0) pos++;
-                    } else {
-                        while(pos < bytes.length) {
-                            const size = bytes[pos++];
-                            if(size === 0) break;
-                            pos += size;
-                        }
-                    }
-                } else if(block === 0x2C) {
-                    if(pos + 9 > bytes.length) break;
-                    const imagePacked = bytes[pos + 8];
-                    pos += 9;
-
-                    if(imagePacked & 0x80) {
-                        pos += 3 * (1 << ((imagePacked & 0x07) + 1));
-                    }
-
-                    pos += 1;
-                    while(pos < bytes.length) {
-                        const size = bytes[pos++];
-                        if(size === 0) break;
-                        pos += size;
-                    }
-
-                    duration += pendingDelay;
-                    pendingDelay = 0;
-                } else {
-                    break;
-                }
-            }
-
-            return duration > 0 ? duration : null;
-        } catch(error) {
-            return null;
-        }
-    }
-
-    async function resolveMascotGifDuration() {
-        try {
-            const response = await fetch('sambutan maskot.gif', { cache: 'no-store' });
-            if(!response.ok) throw new Error('GIF tidak dapat dimuat.');
-            return getGifDurationMs(await response.arrayBuffer());
-        } catch(error) {
-            return null;
-        }
-    }
-
-    async function showMascotWelcome() {
+    function showMascotWelcome() {
         if(mascotWelcome.shownThisLoad || mascotWelcome.active) return;
-        mascotWelcome.shownThisLoad = true;
 
         const overlay = getMascotWelcomeOverlay();
         const gif = getMascotWelcomeGif();
         if(!overlay || !gif) return;
 
-        cleanupMascotWelcome();
         mascotWelcome.shownThisLoad = true;
         mascotWelcome.active = true;
+        mascotWelcome.audioEnded = false;
+        mascotWelcome.gifFinished = false;
+        mascotWelcome.closing = false;
 
         overlay.classList.remove('closing');
         overlay.classList.add('active');
         overlay.setAttribute('aria-hidden', 'false');
         overlay.style.pointerEvents = 'auto';
 
-        const gifSource = gif.getAttribute('data-src') || 'sambutan maskot.gif';
+        gif.style.opacity = '1';
+        gif.style.transition = '';
         gif.removeAttribute('src');
         void gif.offsetWidth;
-        gif.src = gifSource;
+        gif.src = gif.getAttribute('data-src') || 'sambutan maskot.gif';
 
+        // Exactly one audio instance for this page load.
         const audio = new Audio('sambutan audio.mp3');
         audio.preload = 'auto';
         mascotWelcome.audio = audio;
 
         audio.onended = () => {
             mascotWelcome.audioEnded = true;
-            finishMascotWelcomeIfReady();
+            removeMascotFallbackListener();
+            mascotWelcome.audio = null;
         };
         audio.onerror = () => {
             mascotWelcome.audioEnded = true;
-            finishMascotWelcomeIfReady();
+            removeMascotFallbackListener();
+            mascotWelcome.audio = null;
         };
 
-        const durationPromise = resolveMascotGifDuration();
+        // Start GIF and audio in the same activation path.
         const playPromise = audio.play();
         if(playPromise) {
             playPromise.catch(() => {
-                /* Autoplay blocked: keep the GIF running and allow the
-                   first user interaction to start the same audio instance. */
-                mascotWelcome.audioEnded = true;
-                finishMascotWelcomeIfReady();
+                // Autoplay blocked: keep the GIF/overlay timeline unchanged.
+                // The same audio instance can start after the first user interaction.
             });
         }
-
-        let gifDuration = await durationPromise;
-        if(!gifDuration || gifDuration < 100) {
-            gifDuration = 3000;
-        }
-
-        mascotWelcome.gifTimer = setTimeout(() => {
-            mascotWelcome.gifEnded = true;
-            finishMascotWelcomeIfReady();
-        }, gifDuration);
-
         bindMascotAutoplayFallback();
+
+        // The GIF has a fixed visual duration. Audio duration NEVER controls this timer.
+        mascotWelcome.gifTimer = setTimeout(
+            finishMascotGif,
+            MASCOT_GIF_DURATION_MS + MASCOT_GIF_TOLERANCE_MS
+        );
     }
 
     function saveProgress() {
