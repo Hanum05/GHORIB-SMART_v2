@@ -60,7 +60,12 @@
         h3 { font-size: 16px; font-weight: 600; }
         p { color: var(--text-muted); margin-bottom: var(--sp-4); }
         .text-arab { font-family: var(--font-arab); font-size: 32px; line-height: 2; direction: rtl; text-align: right; margin: var(--sp-6) 0; }
-        .highlight { color: var(--primary); font-weight: bold; }
+        .highlight { background:#FFF0A6; color:#292719; font-weight:700; border-radius:4px; padding:0 .08em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
+        .quran-verse { display:block; direction:rtl; unicode-bidi:plaintext; text-align:right; padding:10px 8px; margin:8px 0; border-bottom:1px solid var(--border); overflow-wrap:normal; word-break:normal; }
+        .quran-verse:last-child { border-bottom:0; }
+        .quran-verse-ref { display:block; direction:ltr; text-align:left; font:600 12px/1.4 var(--font-ui); color:var(--text-muted); margin-bottom:4px; }
+        .quran-verse-text { direction:rtl; unicode-bidi:plaintext; font-family:var(--font-arab); font-size:clamp(25px, 4.6vw, 32px); line-height:2.15; text-align:justify; text-align-last:center; }
+        .quran-verse-number { display:inline-block; white-space:nowrap; color:var(--primary); font-size:.78em; padding-inline-start:.25em; }
 
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: 12px 24px; border-radius: var(--rad-full); font-weight: 600; transition: all 0.2s; width: 100%; }
         .btn-primary { background: var(--primary); color: white; }
@@ -394,19 +399,19 @@
     // 1. DATA CENTER — 13 MATERIALS (DOCX SOURCE)
     // ==========================================
     const MATERIALS = [
-{id:1,title:"Ta'dilu I'dilu",surat:"Surah Al-Ma'idah",ayat:"8",juz:"6",desc:"Jika dibaca waqaf, lafaz tetap dibaca أَلَّا تَعْدِلُوا ۚ اعْدِلُوا. Jika dibaca washal, bacaan diteruskan tanpa berhenti di antara kedua lafaz menjadi أَلَّا تَعْدِلُوا اعْدِلُوا.",arabic:'<span class="highlight">أَلَّا تَعْدِلُوا ۚ اعْدِلُوا</span>',audio:"01.ta'dilu i'dilu.mp3",keywords:["ta'dilu","idilu","waqaf","washal","al-ma'idah"]},
-{id:2,title:"Shaad dan Siin Kecil",surat:"Surah Al-Baqarah; Al-A'raf; At-Thur; Al-Ghasyiyah",ayat:"245; 69; 37; 22",juz:"2; 8; 27; 30",desc:"Dalam Al-Qur'an terdapat empat contoh tulisan SHAAD yang di atasnya terdapat SIIN kecil, dengan tiga cara pembacaan:<br><br><b>1. Wajib dibaca SIIN:</b> يَبْصُطُ dan بَصْطَةً. Surah Al-Baqarah ayat 245, juz 2, dan Surah Al-A'raf ayat 69, juz 8.<br><br><b>2. Boleh dibaca SHAAD atau SIIN:</b> أَمْ هُمُ الْمُصَيْطِرُونَ. Surah At-Thur ayat 37, juz 27.<br><br><b>3. Tetap dibaca SHAAD:</b> بِمُصَيْطِرٍ. Surah Al-Ghasyiyah ayat 22, juz 30.",arabic:'<span class="highlight">يَبْصُطُ</span><br><span class="highlight">بَصْطَةً</span><br><span class="highlight">أَمْ هُمُ الْمُصَيْطِرُونَ</span><br><span class="highlight">بِمُصَيْطِرٍ</span>',audio:"02.tahmil 'alaihi yal-hats.mp3",keywords:["shaad","sin kecil","yabsuthu","basthatan","musaytirun","musaytir","baqarah","araf","thur","ghasyiyah"]},
-{id:3,title:"Imalah",surat:"Surah Hud",ayat:"41",juz:"12",desc:"Imalah berarti memiringkan bunyi fathah ke arah kasrah kira-kira dua pertiga. Dalam Al-Qur'an, bacaan Imalah terdapat pada satu tempat, yaitu Surah Hud ayat 41, juz 12.",arabic:'<span class="highlight">مَجْرٰيهَا</span>',audio:"03.Imalah.mp3",keywords:["imalah","majraha","hud"]},
-{id:4,title:"Ya Bunayya Irkam Ma'ana",surat:"Surah Hud",ayat:"42",juz:"12",desc:"Pada lafaz ارْكَبْ مَعَنَا, huruf BAA' sukun bertemu dengan MIIM. BAA' sukun dibaca sebagai MIIM sukun. Kaidah ini disebut Idgham Mutajanisain.<br><br>Catatan: مَجْرٰيهَا adalah pengingat bacaan Imalah; pembahasan Imalah terpisah dari Idgham Mutajanisain.",arabic:'يَا بُنَيَّ <span class="highlight">ارْكَبْ مَعَنَا</span><br>مَجْرٰيهَا',audio:"04.Ya bunayya irkam ma'ana.mp3",keywords:["ya bunayya","irkab","irkam","ma'ana","idgham mutajanisain","hud","imalah"]},
-{id:5,title:"Isymam",surat:"Surah Yusuf",ayat:"11",juz:"12",desc:"Isymam adalah mencampurkan bunyi fathah dengan dhammah yang disertai gerakan bibir mencucu sebagai isyarat bunyi dhammah ketika dengung.",arabic:'<span class="highlight">لَا تَأْمَنَّا</span>',audio:"05.Isymam.mp3",keywords:["isymam","taamanna","yusuf"]},
-{id:6,title:"Saktah",surat:"Surah Al-Kahfi; Yasin; Al-Qiyamah; Al-Muthaffifin",ayat:"1–2; 52; 27; 14",juz:"15; 23; 29; 30",desc:"Saktah adalah berhenti sejenak kira-kira satu alif tanpa mengambil napas.<br><br><b>Empat tempat Saktah:</b><br>1. عِوَجًا ۜ قَيِّمًا — Surah Al-Kahfi ayat 1–2, juz 15.<br>2. مَنْ مَرْقَدِنَا ۜ هَذَا — Surah Yasin ayat 52, juz 23.<br>3. وَقِيلَ مَنْ ۜ رَاقٍ — Surah Al-Qiyamah ayat 27, juz 29.<br>4. كَلَّا بَلْ ۜ رَانَ — Surah Al-Muthaffifin ayat 14, juz 30.",arabic:'<span class="highlight">عِوَجًا ۜ قَيِّمًا</span><br><span class="highlight">مَنْ مَرْقَدِنَا ۜ هَذَا</span><br><span class="highlight">وَقِيلَ مَنْ ۜ رَاقٍ</span><br><span class="highlight">كَلَّا بَلْ ۜ رَانَ</span>',audio:"06.Saktah.mp3",keywords:["saktah","iwaja","qayyima","marqadina","yasin","qiyamah","mutaffifin","kahfi"]},
-{id:7,title:"Ankabut Ittakhadzat Baita",surat:"Surah Al-'Ankabut",ayat:"41",juz:"20",desc:"Jika dibaca waqaf, lafaz الْعَنْكَبُوتْ ۚ اتَّخَذَتْ dibaca dengan berhenti pada lafaz pertama. Jika dibaca washal, lafaz الْعَنْكَبُوتِ اتَّخَذَتْ dibaca bersambung tanpa mengubahnya menjadi bentuk waqaf.",arabic:'<span class="highlight">الْعَنْكَبُوتِ اتَّخَذَتْ بَيْتًا</span><br>الْعَنْكَبُوتْ ۚ اتَّخَذَتْ',audio:"07.Ankabut ittakhadzat baita.mp3",keywords:["ankabut","ittakhadzat","baita","waqaf","washal"]},
-{id:8,title:"Hal Yastawiyani Matsala",surat:"Surah Az-Zumar",ayat:"29",juz:"23",desc:"Materi ini membahas contoh lafaz مَثَلًا الْحَمْدُ لِلَّهِ. Jika dibaca waqaf, bacaan berhenti pada lafaz مَثَلًا sebelum melanjutkan bacaan. Jika dibaca washal, bacaan dilanjutkan tanpa berhenti di antara lafaz.",arabic:'<span class="highlight">هَلْ يَسْتَوِيَانِ مَثَلًا</span><br><span class="highlight">مَثَلًا الْحَمْدُ لِلَّهِ</span>',audio:"08.hal yastawiyani matsala.mp3",keywords:["hal yastawiyani","matsala","masalan","alhamdu lillah","zumar","waqaf","washal"]},
-{id:9,title:"Aa'jamiyyun",surat:"Surah Fussilat",ayat:"44",juz:"24",desc:"Nama bacaan ini adalah Tas-hil. Tas-hil berarti meringankan atau memudahkan bacaan hamzah yang kedua, yaitu membaca hamzah kedua di antara hamzah dan alif.",arabic:'<span class="highlight">ءَاَعْجَمِيٌّ</span>',audio:"09.Aa'jamiyyun.mp3",keywords:["a'jamiyyun","tas-hil","tashil","fussilat"]},
-{id:10,title:"Am Lahum Syirkun fis-Samawati",surat:"Surah Al-Ahqaf",ayat:"4",juz:"26",desc:"Materi ini membahas kaidah Mad Badal pada contoh إِيتُونِي dan variasi penulisan hamzah awal.<br><br>1. Terdapat bentuk tulisan dengan hamzah pertama berkasrah dan bentuk tanpa kasrah. Keduanya dibaca sama, yaitu إِيتُونِي. Kaidah ini disebut Mad Badal.<br><br>2. Cara membaca waqaf pada lafaz فِي السَّمَاوَاتِ ۚ إِيتُونِي berbeda dengan washal. Ketika washal, bentuk bacaan menjadi فِي السَّمَاوَاتِ ائْتُونِي, dengan perubahan cara membaca ya' sukun menjadi hamzah sukun sebagaimana diterangkan dalam materi.",arabic:'أَمْ لَهُمْ شِرْكٌ فِي السَّمَاوَاتِ<br><span class="highlight">فِي السَّمَاوَاتِ ۚ إِيتُونِي</span><br><span class="highlight">فِي السَّمَاوَاتِ ائْتُونِي</span>',audio:"10.am lahum syirkun fis-samâwâti.mp3",keywords:["am lahum","syirkun","samawati","samâwâti","ituni","mad badal","ahqaf"]},
-{id:11,title:"Bi Salismu Fusuqu Ba'dal Iman",surat:"Surah Al-Hujurat",ayat:"11",juz:"26",desc:"Nama bacaan ini adalah Naql. Pada bentuk tulisan tertentu, alif setelah lam tidak dibaca sebagaimana tulisan biasa, sehingga harakat dipindahkan dan bacaan menjadi l-ismu.",arabic:'<span class="highlight">بِئْسَ الِاسْمُ فُسُوقٌ بَعْدَ الْإِيمَانِ</span>',audio:"11.bi salismu fusuqu ba dal iman.mp3",keywords:["naql","bi salismu","ismu","fusuqu","ba'dal iman","hujurat"]},
-{id:12,title:"Salasila wa Aghlala wa Sa'ira",surat:"Surah Ad-Dahr atau Al-Insan",ayat:"4",juz:"29",desc:"Pada lafaz سَلَاسِلَا, jika dibaca washal, bunyi LAA dibaca pendek. Jika terpaksa berhenti atau waqaf, lafaz dapat dibaca panjang atau dengan sukun sebagaimana ketentuan materi.",arabic:'<span class="highlight">سَلَاسِلَا وَأَغْلَالًا وَسَعِيرًا</span>',audio:"12.salâsilâ wa aghlâlâw wa sa'îrâ.mp3",keywords:["salasila","aghlala","sa'ira","insan","dahr","washal","waqaf"]},
-{id:13,title:"Qawarira",surat:"Surah Ad-Dahr atau Al-Insan",ayat:"15–16",juz:"29",desc:"Materi ini membahas perbedaan cara membaca lafaz Qawarira pada Surah Al-Insan ayat 15–16.<br><br>1. Pada akhir ayat 15, jika waqaf, RAA tetap dibaca panjang. Pada awal ayat 16, RAA dibaca pendek.<br>2. Jika ayat 15–16 dibaca washal, kedua RAA dibaca pendek.<br>3. Jika ayat 15–16 dibaca washal tetapi terpaksa berhenti pada lafaz Qawarira ayat 16, RAA pertama dibaca pendek dan RAA kedua dibaca sukun. Setelah itu, bacaan diulang dari Qawarira kedua dan RAA dibaca pendek.",arabic:'<span class="highlight">قَوَارِيرَا</span><br><span class="highlight">قَوَارِيرَا</span>',audio:"13.qawârîrâ.mp3",keywords:["qawarira","qawarira 1","qawarira 2","insan","dahr","waqaf","washal"]}
+      {id:1,title:"Ta'dilu — I'dilu",surat:"Surah Al-Ma'idah",ayat:"8",juz:"6",desc:"Jika dibaca waqaf, lafaz tetap dibaca أَلَّا تَعْدِلُوا ۚ اعْدِلُوا. Jika dibaca washal, bacaan diteruskan tanpa berhenti di antara kedua lafaz menjadi أَلَّا تَعْدِلُوا اعْدِلُوا.",audio:"01.ta'dilu i'dilu.mp3",keywords:["ta'dilu","idilu","waqaf","washal","al-ma'idah"],verses:[{ref:"QS. Al-Ma'idah 5:8",number:"٨",text:"يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ كُونُوا۟ قَوَّٰمِينَ لِلَّهِ شُهَدَآءَ بِٱلْقِسْطِ ۖ وَلَا يَجْرِمَنَّكُمْ شَنَـَٔانُ قَوْمٍ عَلَىٰٓ أَلَّا تَعْدِلُوا۟ ۚ ٱعْدِلُوا۟ هُوَ أَقْرَبُ لِلتَّقْوَىٰ ۖ وَٱتَّقُوا۟ ٱللَّهَ ۚ إِنَّ ٱللَّهَ خَبِيرٌۢ بِمَا تَعْمَلُونَ",focus:["أَلَّا تَعْدِلُوا۟ ۚ ٱعْدِلُوا۟"]}]},
+      {id:2,title:"Tulisan SHAAD dengan SIIN kecil",surat:"Surah Al-Baqarah; Al-A'raf; At-Thur; Al-Ghasyiyah",ayat:"245; 69; 37; 22",juz:"2; 8; 27; 30",desc:"Empat contoh tulisan SHAAD dengan SIIN kecil dan tiga pola pembacaan: (1) wajib dibaca SIIN pada يَبْصُطُ dan بَصْطَةً; (2) boleh dibaca SHAAD atau SIIN pada ٱلْمُصَيْطِرُونَ; (3) tetap dibaca SHAAD pada بِمُصَيْطِرٍ.",audio:"02.tahmil 'alaihi yal-hats.mp3",keywords:["shaad","sin kecil","yabsuthu","basthatan","musaytirun","musaytir","baqarah","araf","thur","ghasyiyah"],verses:[{ref:"QS. Al-Baqarah 2:245",number:"٢٤٥",text:"مَّن ذَا ٱلَّذِي يُقْرِضُ ٱللَّهَ قَرْضًا حَسَنًا فَيُضَٰعِفَهُۥ لَهُۥٓ أَضْعَافًا كَثِيرَةً ۚ وَٱللَّهُ يَقْبِضُ وَيَبْصُۜطُ وَإِلَيْهِ تُرْجَعُونَ",focus:["يَبْصُۜطُ"]},{ref:"QS. Al-A'raf 7:69",number:"٦٩",text:"أَوَعَجِبْتُمْ أَن جَآءَكُم ذِكْرٌ مِّن رَّبِّكُمْ عَلَىٰ رَجُلٍ مِّنكُمْ لِيُنذِرَكُمْ ۚ وَٱذْكُرُوٓا۟ إِذْ جَعَلَكُمْ خُلَفَآءَ مِنۢ بَعْدِ قَوْمِ نُوحٍ وَزَادَكُمْ فِي ٱلْخَلْقِ بَصۜۡطَةٗ ۖ فَٱذْكُرُوٓا۟ ءَالَآءَ ٱللَّهِ لَعَلَّكُمْ تُفْلِحُونَ",focus:["بَصۜۡطَةٗ"]},{ref:"QS. At-Tur 52:37",number:"٣٧",text:"أَمْ عِندَهُمْ خَزَآئِنُ رَبِّكَ أَمْ هُمُ ٱلْمُصَۜيْطِرُونَ",focus:["ٱلْمُصَۜيْطِرُونَ"]},{ref:"QS. Al-Ghasyiyah 88:22",number:"٢٢",text:"لَّسْتَ عَلَيْهِم بِمُصَۜيْطِرٍ",focus:["بِمُصَۜيْطِرٍ"]}]},
+      {id:3,title:"Ya'l-hats — Dzalika",surat:"Surah Al-A'raf",ayat:"176",juz:"9",desc:"Pada lafaz يَلْهَثْ ذَٰلِكَ dibahas Idgham Mutajanisain, termasuk perbedaan bacaan ketika waqaf dan washal. Teks ayat ditampilkan utuh.",audio:"02.tahmil 'alaihi yal-hats.mp3",keywords:["yalhats","yal-hats","dzalika","idgham mutajanisain","waqaf","washal","al-araf"],verses:[{ref:"QS. Al-A'raf 7:176",number:"١٧٦",text:"وَلَوْ شِئْنَا لَرَفَعْنَٰهُ بِهَا وَلَٰكِنَّهُۥٓ أَخْلَدَ إِلَى ٱلْأَرْضِ وَٱتَّبَعَ هَوَىٰهُ ۚ فَمَثَلُهُۥ كَمَثَلِ ٱلْكَلْبِ إِن تَحْمِلْ عَلَيْهِ يَلْهَثْ أَوْ تَتْرُكْهُ يَلْهَث ۚ ذَٰلِكَ مَثَلُ ٱلْقَوْمِ ٱلَّذِينَ كَذَّبُوا۟ بِـَٔايَٰتِنَا ۚ فَٱقْصُصِ ٱلْقَصَصَ لَعَلَّهُمْ يَتَفَكَّرُونَ",focus:["يَلْهَث ۚ ذَٰلِكَ"]}]},
+      {id:4,title:"Imalah",surat:"Surah Hud",ayat:"41",juz:"12",desc:"Imalah berarti memiringkan bunyi fathah ke arah kasrah kira-kira dua pertiga. Contohnya terdapat pada lafaz مَجْر۪ىٰهَا dalam Surah Hud ayat 41.",audio:"03.Imalah.mp3",keywords:["imalah","majraha","hud"],verses:[{ref:"QS. Hud 11:41",number:"٤١",text:"۞ وَقَالَ ٱرْكَبُوا۟ فِيهَا بِسْمِ ٱللَّهِ مَجْر۪ىٰهَا وَمُرْسَىٰهَآ ۚ إِنَّ رَبِّي لَغَفُورٌ رَّحِيمٌ",focus:["مَجْر۪ىٰهَا"]}]},
+      {id:5,title:"Ya Bunayya — Irkam Ma'ana",surat:"Surah Hud",ayat:"42",juz:"12",desc:"Pada lafaz ارْكَبْ مَعَنَا, huruf BAA' sukun bertemu MIIM. BAA' sukun diidghamkan menjadi MIIM sukun; kaidah ini disebut Idgham Mutajanisain.",audio:"04.Ya bunayya irkam ma'ana.mp3",keywords:["ya bunayya","irkab","irkam","ma'ana","idgham mutajanisain","hud"],verses:[{ref:"QS. Hud 11:42",number:"٤٢",text:"وَهِيَ تَجْرِي بِهِمْ فِي مَوْجٍ كَٱلْجِبَالِ وَنَادَىٰ نُوحٌ ٱبْنَهُۥ وَكَانَ فِي مَعْزِلٍ يَٰبُنَيَّ ٱرْكَبْ مَعَنَا وَلَا تَكُن مَّعَ ٱلْكَافِرِينَ",focus:["يَٰبُنَيَّ ٱرْكَبْ مَعَنَا"]}]},
+      {id:6,title:"Isymam",surat:"Surah Yusuf",ayat:"11",juz:"12",desc:"Isymam adalah mencampurkan bunyi fathah dengan dhammah yang disertai gerakan bibir mencucu sebagai isyarat bunyi dhammah ketika dengung.",audio:"05.Isymam.mp3",keywords:["isymam","taamanna","yusuf"],verses:[{ref:"QS. Yusuf 12:11",number:"١١",text:"قَالُوا۟ يَـٰٓأَبَانَا مَا لَكَ لَا تَأْمَ۫نَّا عَلَىٰ يُوسُفَ وَإِنَّا لَهُۥ لَنَٰصِحُونَ",focus:["لَا تَأْمَ۫نَّا"]}]},
+      {id:7,title:"Saktah",surat:"Surah Al-Kahfi; Yasin; Al-Qiyamah; Al-Muthaffifin",ayat:"1–2; 52; 27; 14",juz:"15; 23; 29; 30",desc:"Saktah adalah berhenti sejenak tanpa mengambil napas. Empat lokasi yang dibahas ditampilkan lengkap; pada QS. Al-Kahfi ditampilkan ayat 1 dan 2 secara terpisah.",audio:"06.Saktah.mp3",keywords:["saktah","iwaja","qayyima","marqadina","yasin","qiyamah","mutaffifin","kahfi"],verses:[{ref:"QS. Al-Kahfi 18:1",number:"١",text:"ٱلْحَمْدُ لِلَّهِ ٱلَّذِيٓ أَنزَلَ عَلَىٰ عَبْدِهِ ٱلْكِتَٰبَ وَلَمْ يَجْعَل لَّهُۥ عِوَجَاۜ",focus:["عِوَجَاۜ"]},{ref:"QS. Al-Kahfi 18:2",number:"٢",text:"قَيِّمًا لِّيُنذِرَ بَأْسًا شَدِيدًا مِّن لَّدُنْهُ وَيُبَشِّرَ ٱلْمُؤْمِنِينَ ٱلَّذِينَ يَعْمَلُونَ ٱلصَّٰلِحَٰتِ أَنَّ لَهُمْ أَجْرًا حَسَنًا",focus:["قَيِّمًا"]},{ref:"QS. Yasin 36:52",number:"٥٢",text:"قَالُوا۟ يَٰوَيْلَنَا مَن بَعَثَنَا مِن مَّرْقَدِنَاۜ هَٰذَا مَا وَعَدَ ٱلرَّحْمَٰنُ وَصَدَقَ ٱلْمُرْسَلُونَ",focus:["مَّرْقَدِنَاۜ هَٰذَا"]},{ref:"QS. Al-Qiyamah 75:27",number:"٢٧",text:"وَقِيلَ مَنْ ۜ رَاقٍ",focus:["مَنْ ۜ رَاقٍ"]},{ref:"QS. Al-Muthaffifin 83:14",number:"١٤",text:"كَلَّا بَلْۜ رَانَ عَلَىٰ قُلُوبِهِم مَّا كَانُوا۟ يَكْسِبُونَ",focus:["كَلَّا بَلْۜ رَانَ"]}]},
+      {id:8,title:"Al-'Ankabut — Ittakhadzat",surat:"Surah Al-'Ankabut",ayat:"41",juz:"20",desc:"Jika dibaca waqaf, lafaz الْعَنْكَبُوتْ ۚ اتَّخَذَتْ dibaca dengan berhenti pada lafaz pertama. Jika dibaca washal, lafaz الْعَنْكَبُوتِ اتَّخَذَتْ dibaca bersambung tanpa mengubahnya menjadi bentuk waqaf.",audio:"07.Ankabut ittakhadzat baita.mp3",keywords:["ankabut","ittakhadzat","baita","waqaf","washal"],verses:[{ref:"QS. Al-'Ankabut 29:41",number:"٤١",text:"مَثَلُ ٱلَّذِينَ ٱتَّخَذُوا۟ مِن دُونِ ٱللَّهِ أَوْلِيَآءَ كَمَثَلِ ٱلْعَنكَبُوتِ ٱتَّخَذَتْ بَيْتًا ۖ وَإِنَّ أَوْهَنَ ٱلْبُيُوتِ لَبَيْتُ ٱلْعَنكَبُوتِ ۖ لَوْ كَانُوا۟ يَعْلَمُونَ",focus:["ٱلْعَنكَبُوتِ ٱتَّخَذَتْ"]}]},
+      {id:9,title:"Matsalan — Alhamdulillah",surat:"Surah Az-Zumar",ayat:"29",juz:"23",desc:"Materi ini membahas contoh lafaz مَثَلًا الْحَمْدُ لِلَّهِ. Jika dibaca waqaf, bacaan berhenti pada lafaz مَثَلًا sebelum melanjutkan bacaan. Jika dibaca washal, bacaan dilanjutkan tanpa berhenti di antara lafaz.",audio:"08.hal yastawiyani matsala.mp3",keywords:["hal yastawiyani","matsala","masalan","alhamdu lillah","zumar","waqaf","washal"],verses:[{ref:"QS. Az-Zumar 39:29",number:"٢٩",text:"ضَرَبَ ٱللَّهُ مَثَلًا رَّجُلًا فِيهِ شُرَكَآءُ مُتَشَٰكِسُونَ وَرَجُلًا سَلَمًا لِّرَجُلٍ هَلْ يَسْتَوِيَانِ مَثَلًا ۚ ٱلْحَمْدُ لِلَّهِ ۚ بَلْ أَكْثَرُهُمْ لَا يَعْلَمُونَ",focus:["مَثَلًا ۚ ٱلْحَمْدُ لِلَّهِ"]}]},
+      {id:10,title:"Tas-hil — A'a'jamiyyun",surat:"Surah Fussilat",ayat:"44",juz:"24",desc:"Tas-hil berarti meringankan bacaan hamzah kedua, yaitu membacanya di antara hamzah dan alif. Contoh terdapat pada lafaz ءَا۬عْجَمِيٌّۭ.",audio:"09.Aa'jamiyyun.mp3",keywords:["a'jamiyyun","tas-hil","tashil","fussilat"],verses:[{ref:"QS. Fussilat 41:44",number:"٤٤",text:"وَلَوْ جَعَلْنَٰهُ قُرْءَانًا أَعْجَمِيًّا لَّقَالُوا۟ لَوْلَا فُصِّلَتْ ءَايَٰتُهُۥٓ ۖ ءَا۬عْجَمِيٌّ وَعَرَبِيٌّ ۗ قُلْ هُوَ لِلَّذِينَ ءَامَنُوا۟ هُدًى وَشِفَآءٌ ۖ وَٱلَّذِينَ لَا يُؤْمِنُونَ فِيٓ ءَاذَانِهِمْ وَقْرٌ وَهُوَ عَلَيْهِمْ عَمًى ۚ أُو۟لَٰٓئِكَ يُنَادَوْنَ مِن مَّكَانٍ بَعِيدٍ",focus:["ءَا۬عْجَمِيٌّ"]}]},
+      {id:11,title:"Mad Badal — Am Lahum Syirkun fis-Samawati",surat:"Surah Al-Ahqaf",ayat:"4",juz:"26",desc:"Materi ini membahas kaidah Mad Badal pada contoh إِيتُونِي dan variasi penulisan hamzah awal.<br><br>1. Terdapat bentuk tulisan dengan hamzah pertama berkasrah dan bentuk tanpa kasrah. Keduanya dibaca sama, yaitu إِيتُونِي. Kaidah ini disebut Mad Badal.<br><br>2. Cara membaca waqaf pada lafaz فِي السَّمَاوَاتِ ۚ إِيتُونِي berbeda dengan washal. Ketika washal, bentuk bacaan menjadi فِي السَّمَاوَاتِ ائْتُونِي, dengan perubahan cara membaca ya' sukun menjadi hamzah sukun sebagaimana diterangkan dalam materi.",audio:"10.am lahum syirkun fis-samâwâti.mp3",keywords:["am lahum","syirkun","samawati","samâwâti","ituni","mad badal","ahqaf","waqaf","washal"],verses:[{ref:"QS. Al-Ahqaf 46:4",number:"٤",text:"قُلْ أَرَءَيْتُم مَّا تَدْعُونَ مِن دُونِ ٱللَّهِ أَرُونِي مَاذَا خَلَقُوا۟ مِنَ ٱلْأَرْضِ أَمْ لَهُمْ شِرْكٌ فِي ٱلسَّمَٰوَٰتِ ۖ ائْتُونِي بِكِتَٰبٍ مِّن قَبْلِ هَٰذَآ أَوْ أَثَٰرَةٍ مِّنْ عِلْمٍ إِن كُنتُمْ صَٰدِقِينَ",focus:["ائْتُونِي"]}]},
+      {id:12,title:"Naql — Bi'sal Ismu",surat:"Surah Al-Hujurat",ayat:"11",juz:"26",desc:"Nama bacaan ini adalah Naql. Pada bentuk tulisan tertentu, alif setelah lam tidak dibaca sebagaimana tulisan biasa, sehingga harakat dipindahkan dan bacaan menjadi l-ismu.",audio:"11.bi salismu fusuqu ba dal iman.mp3",keywords:["naql","bi salismu","ismu","fusuqu","ba'dal iman","hujurat"],verses:[{ref:"QS. Al-Hujurat 49:11",number:"١١",text:"يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ لَا يَسْخَرْ قَوْمٌ مِّن قَوْمٍ عَسَىٰٓ أَن يَكُونُوا۟ خَيْرًا مِّنْهُمْ وَلَا نِسَآءٌ مِّن نِّسَآءٍ عَسَىٰٓ أَن يَكُنَّ خَيْرًا مِّنْهُنَّ ۖ وَلَا تَلْمِزُوٓا۟ أَنفُسَكُمْ وَلَا تَنَابَزُوا۟ بِٱلْأَلْقَٰبِ ۖ بِئْسَ ٱلِٱسْمُ ٱلْفُسُوقُ بَعْدَ ٱلْإِيمَٰنِ ۚ وَمَن لَّمْ يَتُبْ فَأُو۟لَٰٓئِكَ هُمُ ٱلظَّٰلِمُونَ",focus:["بِئْسَ ٱلِٱسْمُ"]}]},
+      {id:13,title:"Salasila dan Qawarira",surat:"Surah Al-Insan",ayat:"4; 15–16",juz:"29",desc:"Salasila: ketika washal, bunyi akhir dibaca pendek; ketika waqaf atau terpaksa berhenti, ikuti ketentuan bacaan yang dipelajari. Qawarira: pada akhir ayat 15 RAA dibaca panjang saat waqaf, sedangkan awal ayat 16 dibaca pendek; jika washal keduanya dibaca pendek. Jika terpaksa berhenti pada lafaz Qawarira ayat 16, ikuti penjelasan materi tentang sukun pada RAA kedua lalu ulangi bacaan sesuai ketentuan.",audio:"12.salâsilâ wa aghlâlâw wa sa'îrâ.mp3",audioExtra:"13.qawârîrâ.mp3",keywords:["salasila","aghlala","sa'ira","qawarira","insan","waqaf","washal","terpaksa berhenti"],verses:[{ref:"QS. Al-Insan 76:4",number:"٤",text:"إِنَّآ أَعْتَدْنَا لِلْكَٰفِرِينَ سَلَٰسِلَا۟ وَأَغْلَٰلًا وَسَعِيرًا",focus:["سَلَٰسِلَا۟"]},{ref:"QS. Al-Insan 76:15",number:"١٥",text:"وَيُطَافُ عَلَيْهِم بِـَٔانِيَةٍ مِّن فِضَّةٍ وَأَكْوَابٍ كَانَتْ قَوَارِيرَا۠",focus:["قَوَارِيرَا۠"]},{ref:"QS. Al-Insan 76:16",number:"١٦",text:"قَوَارِيرَا مِن فِضَّةٍ قَدَّرُوهَا تَقْدِيرًا",focus:["قَوَارِيرَا"]}]}
     ];
 
     const QUIZ_QUESTIONS = [
@@ -1056,6 +1061,18 @@
         currentAudioPlayer: null
     };
 
+    // Migrate stored material-progress IDs once because a missing lesson was added
+    // and the Salasila/Qawarira lessons were combined. Existing progress is retained.
+    if (!Storage.get('materials_v2_migrated')) {
+        const oldToNewMaterialId = { 1:1, 2:2, 3:4, 4:5, 5:6, 6:7, 7:8, 8:9, 9:10, 10:11, 11:12, 12:13, 13:13 };
+        const migrateMaterialId = id => Object.prototype.hasOwnProperty.call(oldToNewMaterialId, id) ? oldToNewMaterialId[id] : id;
+        AppState.progress.completed = [...new Set((AppState.progress.completed || []).map(migrateMaterialId))];
+        AppState.progress.inProgress = [...new Set((AppState.progress.inProgress || []).map(migrateMaterialId))];
+        if (AppState.progress.lastMaterial != null) AppState.progress.lastMaterial = migrateMaterialId(AppState.progress.lastMaterial);
+        Storage.set('progress', AppState.progress);
+        Storage.set('materials_v2_migrated', true);
+    }
+
     /* --- HOME MASCOT WELCOME STATE --- */
     const MASCOT_GIF_DURATION_MS = 14270;
     const MASCOT_GIF_TOLERANCE_MS = 120;
@@ -1459,7 +1476,7 @@
             addXP(5); // Scan activity XP
 
             boxContainer.innerHTML = `
-                <div class="detection-highlight" style="top: 42%; left: 28%; width: 150px; height: 48px;" onclick="openPopupSheetForMaterial(3)">
+                <div class="detection-highlight" style="top: 42%; left: 28%; width: 150px; height: 48px;" onclick="openPopupSheetForMaterial(4)">
                     <span style="font-size:10px; color:white; font-weight:bold; background:var(--primary); padding:2px 4px; border-radius:3px;">Imalah (94%)</span>
                 </div>
             `;
@@ -1472,9 +1489,9 @@
 
         document.getElementById('popup-title').innerText = mat.title;
         document.getElementById('popup-surat').innerText = `${mat.surat} Ayat ${mat.ayat}`;
-        document.getElementById('popup-arab').innerHTML = mat.arabic;
+        document.getElementById('popup-arab').innerHTML = renderArabic(mat);
         document.getElementById('popup-desc').innerText = mat.desc;
-        document.getElementById('popup-audio-container').innerHTML = renderAudioPlayer(mat.audio, `Pelafalan ${mat.title}`);
+        document.getElementById('popup-audio-container').innerHTML = renderAudioPlayer(mat.audio, `Pelafalan ${mat.title}`) + (mat.audioExtra ? renderAudioPlayer(mat.audioExtra, `Pelafalan tambahan ${mat.title}`) : '');
         
         document.getElementById('popup-detail-btn').onclick = () => {
             closeScanner();
@@ -1645,6 +1662,34 @@
         `;
     }
 
+    function escapeHtmlText(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // All Arabic verse text is stored as plain text. Only the trusted focus strings
+    // are wrapped during rendering; no source verse string is interpreted as HTML.
+    function renderArabic(mat) {
+        return (mat.verses || []).map(verse => {
+            let remaining = verse.text;
+            const pieces = [];
+            const focusTerms = [...(verse.focus || [])].sort((a, b) => b.length - a.length);
+            while (remaining.length) {
+                let bestIndex = -1, bestTerm = '';
+                for (const term of focusTerms) {
+                    const index = remaining.indexOf(term);
+                    if (index !== -1 && (bestIndex === -1 || index < bestIndex || (index === bestIndex && term.length > bestTerm.length))) {
+                        bestIndex = index; bestTerm = term;
+                    }
+                }
+                if (bestIndex === -1) { pieces.push(escapeHtmlText(remaining)); break; }
+                if (bestIndex > 0) pieces.push(escapeHtmlText(remaining.slice(0, bestIndex)));
+                pieces.push('<span class="highlight">' + escapeHtmlText(bestTerm) + '</span>');
+                remaining = remaining.slice(bestIndex + bestTerm.length);
+            }
+            return '<div class="quran-verse"><span class="quran-verse-ref">' + escapeHtmlText(verse.ref) + '</span><span class="quran-verse-text">' + pieces.join('') + '<span class="quran-verse-number">۝ ' + escapeHtmlText(verse.number) + '</span></span></div>';
+        }).join('');
+    }
+
     /* --- MATERIAL LIBRARY --- */
     function renderMaterialList() {
         return `
@@ -1669,7 +1714,7 @@
         const p = AppState.progress;
         let filtered = MATERIALS.filter(m => {
             const query = searchQuery.toLowerCase().trim();
-            const searchable = [m.title, m.surat, m.ayat, m.juz, m.desc, m.arabic.replace(/<[^>]*>/g, ' '), ...(m.keywords || [])].join(' ').toLowerCase();
+            const searchable = [m.title, m.surat, m.ayat, m.juz, m.desc, (m.verses || []).map(v => v.text).join(' '), ...(m.keywords || [])].join(' ').toLowerCase();
             const matchesSearch = !query || searchable.includes(query);
             if(!matchesSearch) return false;
             const isDone = p.completed.includes(m.id);
@@ -1727,11 +1772,12 @@
                     <h3 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:12px;">DEFINISI & PENJELASAN</h3>
                     <p style="line-height:1.6; color:var(--text-main);">${mat.desc}</p>
                     <h3 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:12px; margin-top:24px;">CONTOH LAFAZ / AYAT</h3>
-                    <div class="card" style="background:white; text-align:center; padding:20px;"><div class="text-arab">${mat.arabic}</div></div>
+                    <div class="card" style="background:white; padding:14px;"><div class="text-arab quran-text">${renderArabic(mat)}</div></div>
                 </div>
                 <div class="sticky-panel">
                     <h3 style="color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:12px;">AUDIO PELAFALAN</h3>
                     ${renderAudioPlayer(mat.audio, `Pelafalan ${mat.title}`)}
+                    ${mat.audioExtra ? renderAudioPlayer(mat.audioExtra, `Pelafalan tambahan ${mat.title}`) : ""}
                     <div style="margin-top:20px;">
                         <button id="btn-complete-mat" class="btn ${isDone ? 'btn-outline' : 'btn-primary'}" onclick="markMaterialComplete(${mat.id})">
                             ${isDone ? '<i class="ph-check-circle" style="color:var(--success)"></i> Selesai Dipelajari' : 'Saya Sudah Memahami (+15 XP)'}
@@ -1757,9 +1803,10 @@
 
     /* --- AUDIO LIBRARY --- */
     function renderAudioLibrary() {
-        let html = `<h2>Audio Bacaan Ghorib</h2><p>Daftar 13 audio pelafalan resmi.</p><div style="display:flex; flex-direction:column; gap:8px; margin-top:16px;">`;
+        let html = `<h2>Audio Bacaan Ghorib</h2><p>Daftar audio pelafalan untuk 13 materi, termasuk audio tambahan.</p><div style="display:flex; flex-direction:column; gap:8px; margin-top:16px;">`;
         MATERIALS.forEach(m => {
             html += renderAudioPlayer(m.audio, `${m.id < 10 ? '0'+m.id : m.id} - ${m.title}`);
+            if (m.audioExtra) html += renderAudioPlayer(m.audioExtra, `Audio tambahan - ${m.title}`);
         });
         html += `</div>`;
         return html;
