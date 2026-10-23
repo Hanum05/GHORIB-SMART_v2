@@ -394,100 +394,22 @@
     // 1. DATA CENTER — 13 MATERIALS (DOCX SOURCE)
     // ==========================================
     const MATERIALS = [
-        {
-            id: 1, title: 'Imalah', surat: 'Surat Hud', ayat: '41', juz: '12',
-            desc: 'Imalah secara bahasa berarti condong. Secara istilah berarti mencondongkan fathah kepada kasrah dan mencondongkan alif kepada ya. Dalam Al-Qur\'an riwayat Hafsh hanya terdapat pada satu tempat.',
-            arabic: 'بِسْمِ ٱللَّهِ <span class="highlight">مَجْرٜىٰهَا</span> وَمُرْسَىٰهَآ',
-            audio: 'bacaan 1.m4a',
-            keywords: ['majraha', 'imalah', 'hud']
-        },
-        {
-            id: 2, title: 'Isymam', surat: 'Surat Yusuf', ayat: '11', juz: '12',
-            desc: 'Isymam adalah mencampurkan dhommah pada sukun dengan memoncongkan dua bibir saat membaca lafaz ta\'amanna.',
-            arabic: 'قَالُوا۟ يَـٰٓأَبَانَا مَا لَكَ <span class="highlight">لَا تَأْمَ۫نَّا</span> عَلَىٰ يُوسُفَ',
-            audio: 'bacaan 2.m4a',
-            keywords: ['taamanna', 'isymam', 'yusuf']
-        },
-        {
-            id: 3, title: 'Saktah', surat: 'Al-Kahfi', ayat: '1-2', juz: '15',
-            desc: 'Saktah adalah berhenti sejenak tanpa bernapas selama kurang lebih 2 harakat dengan tujuan memperjelas makna.',
-            arabic: 'عِوَجَاۜ ۝ قَيِّمًا',
-            audio: 'bacaan 3.m4a',
-            keywords: ['saktah', 'kahfi', 'yasin']
-        },
-        {
-            id: 4, title: 'Tashil', surat: 'Fussilat', ayat: '44', juz: '24',
-            desc: 'Tashil secara bahasa berarti memberi kemudahan. Secara istilah membaca hamzah kedua di antara hamzah dan alif.',
-            arabic: '<span class="highlight">ءَا۬عْجَمِىٌّ</span> وَعَرَبِىٌّ',
-            audio: 'bacaan 4.m4a',
-            keywords: ['a\'jamiyyun', 'tashil', 'fussilat']
-        },
-        {
-            id: 5, title: 'Naql', surat: 'Al-Hujurat', ayat: '11', juz: '26',
-            desc: 'Naql adalah memindahkan harakat hamzah ke huruf mati sebelumnya, yaitu membaca al-ismu menjadi l-ismu.',
-            arabic: '<span class="highlight">بِئْسَ ٱلِٱسْمُ</span> ٱلْفُسُوقُ',
-            audio: 'bacaan 5.m4a',
-            keywords: ['biitsismu', 'naql', 'hujurat']
-        },
-        {
-            id: 6, title: 'Mad Badal', surat: 'Umum', ayat: '-', juz: '-',
-            desc: 'Mad Badal terjadi apabila hamzah bertemu dengan huruf mad di dalam satu kata karena penggantian hamzah sukun.',
-            arabic: '<span class="highlight">ءَامَنُوا۟</span>',
-            audio: 'bacaan 6.m4a',
-            keywords: ['aamanu', 'mad badal']
-        },
-        {
-            id: 7, title: 'Shaad dibaca Sin', surat: 'Al-Baqarah', ayat: '245', juz: '2',
-            desc: 'Huruf Shaad (ص) yang tertulis dengan tanda Sin kecil di atasnya dibaca menggunakan huruf Sin (س).',
-            arabic: 'وَٱللَّهُ يَقْبِضُ <span class="highlight">وَيَبْصُۜطُ</span>',
-            audio: 'bacaan 7.m4a',
-            keywords: ['wayabsuthu', 'shaad', 'sin']
-        },
-        {
-            id: 8, title: 'Idgham Mutajanisain', surat: 'Hud', ayat: '42', juz: '12',
-            desc: 'Penggabungan dua huruf yang sama makhraj tetapi beda sifat, seperti Ba\' sukun bertemu Mim pada arkab ma\'ana.',
-            arabic: 'يَـٰبُنَىَّ <span class="highlight">ٱرْكَب مَّعَنَا</span>',
-            audio: 'bacaan 8.m4a',
-            keywords: ['irkab ma\'ana', 'mutajanisain']
-        },
-        {
-            id: 9, title: 'Waqaf/Washal Qawarira (1)', surat: 'Al-Insan', ayat: '15', juz: '29',
-            desc: 'Aturan khusus bacaan Qawarira pertama: dibaca panjang ketika waqaf dan dibaca pendek ketika washal.',
-            arabic: 'أَكْوَابٍ كَانَتْ <span class="highlight">قَوَارِيرَا۠</span>',
-            audio: 'bacaan 9.m4a',
-            keywords: ['qawarira', 'insan']
-        },
-        {
-            id: 10, title: 'Qawarira (Ayat 16)', surat: 'Al-Insan', ayat: '16', juz: '29',
-            desc: 'Lafaz Qawarira kedua pada ayat 16 dibaca sukun ketika waqaf dan dibaca pendek tanpa tanwin ketika washal.',
-            arabic: '<span class="highlight">قَوَارِيرَا۟</span> مِن فِضَّةٍ',
-            audio: 'bacaan 10.m4a',
-            keywords: ['qawarira 2', 'insan 16']
-        },
-        {
-            id: 11, title: 'Salasila', surat: 'Al-Insan', ayat: '4', juz: '29',
-            desc: 'Kata Salasila ketika waqaf dapat dibaca dengan dua cara: sukun (Salasil) atau alif panjang (Salasila).',
-            arabic: 'إِنَّآ أَعْتَدْنَا لِلْكَـٰفِرِينَ <span class="highlight">سَلَـٰسِلَا۟</span>',
-            audio: 'bacaan 11.m4a',
-            keywords: ['salasila', 'insan']
-        },
-        {
-            id: 12, title: 'Contoh Al-\'Ankabut', surat: 'Al-Ankabut', ayat: '14', juz: '20',
-            desc: 'Penjelasan kaidah tilawah khusus pada bacaan surat Al-Ankabut sesuai riwayat Imam Hafsh.',
-            arabic: 'وَلَقَدْ أَرْسَلْنَا نُوحًا إِلَىٰ قَوْمِهِۦ فَلَبِثَ فِيهِمْ أَلْفَ سَنَةٍ إِلَّا خَمْسِينَ عَامًا',
-            audio: 'bacaan 12.m4a',
-            keywords: ['ankabut']
-        },
-        {
-            id: 13, title: 'مَثَلًا الْحَمْدُ لِلَّهِ', surat: 'Az-Zumar', ayat: '29', juz: '23',
-            desc: 'Pengucapan lafaz ketika terjadi pertemuan tanwin bertemu hamzah washal.',
-            arabic: 'ضَرَبَ ٱللَّهُ <span class="highlight">مَثَلًا ٱلْحَمْدُ لِلَّهِ</span>',
-            audio: 'bacaan 13.m4a',
-            keywords: ['masalan alhamdulillah', 'zumar']
-        }
+{id:1,title:"Ta'dilu I'dilu",surat:"Surah Al-Ma'idah",ayat:"8",juz:"6",desc:"Jika dibaca waqaf, lafaz tetap dibaca أَلَّا تَعْدِلُوا ۚ اعْدِلُوا. Jika dibaca washal, bacaan diteruskan tanpa berhenti di antara kedua lafaz menjadi أَلَّا تَعْدِلُوا اعْدِلُوا.",arabic:'<span class="highlight">أَلَّا تَعْدِلُوا ۚ اعْدِلُوا</span>',audio:"01.ta'dilu i'dilu.mp3",keywords:["ta'dilu","idilu","waqaf","washal","al-ma'idah"]},
+{id:2,title:"Shaad dan Siin Kecil",surat:"Surah Al-Baqarah; Al-A'raf; At-Thur; Al-Ghasyiyah",ayat:"245; 69; 37; 22",juz:"2; 8; 27; 30",desc:"Dalam Al-Qur'an terdapat empat contoh tulisan SHAAD yang di atasnya terdapat SIIN kecil, dengan tiga cara pembacaan:<br><br><b>1. Wajib dibaca SIIN:</b> يَبْصُطُ dan بَصْطَةً. Surah Al-Baqarah ayat 245, juz 2, dan Surah Al-A'raf ayat 69, juz 8.<br><br><b>2. Boleh dibaca SHAAD atau SIIN:</b> أَمْ هُمُ الْمُصَيْطِرُونَ. Surah At-Thur ayat 37, juz 27.<br><br><b>3. Tetap dibaca SHAAD:</b> بِمُصَيْطِرٍ. Surah Al-Ghasyiyah ayat 22, juz 30.",arabic:'<span class="highlight">يَبْصُطُ</span><br><span class="highlight">بَصْطَةً</span><br><span class="highlight">أَمْ هُمُ الْمُصَيْطِرُونَ</span><br><span class="highlight">بِمُصَيْطِرٍ</span>',audio:"02.tahmil 'alaihi yal-hats.mp3",keywords:["shaad","sin kecil","yabsuthu","basthatan","musaytirun","musaytir","baqarah","araf","thur","ghasyiyah"]},
+{id:3,title:"Imalah",surat:"Surah Hud",ayat:"41",juz:"12",desc:"Imalah berarti memiringkan bunyi fathah ke arah kasrah kira-kira dua pertiga. Dalam Al-Qur'an, bacaan Imalah terdapat pada satu tempat, yaitu Surah Hud ayat 41, juz 12.",arabic:'<span class="highlight">مَجْرٰيهَا</span>',audio:"03.Imalah.mp3",keywords:["imalah","majraha","hud"]},
+{id:4,title:"Ya Bunayya Irkam Ma'ana",surat:"Surah Hud",ayat:"42",juz:"12",desc:"Pada lafaz ارْكَبْ مَعَنَا, huruf BAA' sukun bertemu dengan MIIM. BAA' sukun dibaca sebagai MIIM sukun. Kaidah ini disebut Idgham Mutajanisain.<br><br>Catatan: مَجْرٰيهَا adalah pengingat bacaan Imalah; pembahasan Imalah terpisah dari Idgham Mutajanisain.",arabic:'يَا بُنَيَّ <span class="highlight">ارْكَبْ مَعَنَا</span><br>مَجْرٰيهَا',audio:"04.Ya bunayya irkam ma'ana.mp3",keywords:["ya bunayya","irkab","irkam","ma'ana","idgham mutajanisain","hud","imalah"]},
+{id:5,title:"Isymam",surat:"Surah Yusuf",ayat:"11",juz:"12",desc:"Isymam adalah mencampurkan bunyi fathah dengan dhammah yang disertai gerakan bibir mencucu sebagai isyarat bunyi dhammah ketika dengung.",arabic:'<span class="highlight">لَا تَأْمَنَّا</span>',audio:"05.Isymam.mp3",keywords:["isymam","taamanna","yusuf"]},
+{id:6,title:"Saktah",surat:"Surah Al-Kahfi; Yasin; Al-Qiyamah; Al-Muthaffifin",ayat:"1–2; 52; 27; 14",juz:"15; 23; 29; 30",desc:"Saktah adalah berhenti sejenak kira-kira satu alif tanpa mengambil napas.<br><br><b>Empat tempat Saktah:</b><br>1. عِوَجًا ۜ قَيِّمًا — Surah Al-Kahfi ayat 1–2, juz 15.<br>2. مَنْ مَرْقَدِنَا ۜ هَذَا — Surah Yasin ayat 52, juz 23.<br>3. وَقِيلَ مَنْ ۜ رَاقٍ — Surah Al-Qiyamah ayat 27, juz 29.<br>4. كَلَّا بَلْ ۜ رَانَ — Surah Al-Muthaffifin ayat 14, juz 30.",arabic:'<span class="highlight">عِوَجًا ۜ قَيِّمًا</span><br><span class="highlight">مَنْ مَرْقَدِنَا ۜ هَذَا</span><br><span class="highlight">وَقِيلَ مَنْ ۜ رَاقٍ</span><br><span class="highlight">كَلَّا بَلْ ۜ رَانَ</span>',audio:"06.Saktah.mp3",keywords:["saktah","iwaja","qayyima","marqadina","yasin","qiyamah","mutaffifin","kahfi"]},
+{id:7,title:"Ankabut Ittakhadzat Baita",surat:"Surah Al-'Ankabut",ayat:"41",juz:"20",desc:"Jika dibaca waqaf, lafaz الْعَنْكَبُوتْ ۚ اتَّخَذَتْ dibaca dengan berhenti pada lafaz pertama. Jika dibaca washal, lafaz الْعَنْكَبُوتِ اتَّخَذَتْ dibaca bersambung tanpa mengubahnya menjadi bentuk waqaf.",arabic:'<span class="highlight">الْعَنْكَبُوتِ اتَّخَذَتْ بَيْتًا</span><br>الْعَنْكَبُوتْ ۚ اتَّخَذَتْ',audio:"07.Ankabut ittakhadzat baita.mp3",keywords:["ankabut","ittakhadzat","baita","waqaf","washal"]},
+{id:8,title:"Hal Yastawiyani Matsala",surat:"Surah Az-Zumar",ayat:"29",juz:"23",desc:"Materi ini membahas contoh lafaz مَثَلًا الْحَمْدُ لِلَّهِ. Jika dibaca waqaf, bacaan berhenti pada lafaz مَثَلًا sebelum melanjutkan bacaan. Jika dibaca washal, bacaan dilanjutkan tanpa berhenti di antara lafaz.",arabic:'<span class="highlight">هَلْ يَسْتَوِيَانِ مَثَلًا</span><br><span class="highlight">مَثَلًا الْحَمْدُ لِلَّهِ</span>',audio:"08.hal yastawiyani matsala.mp3",keywords:["hal yastawiyani","matsala","masalan","alhamdu lillah","zumar","waqaf","washal"]},
+{id:9,title:"Aa'jamiyyun",surat:"Surah Fussilat",ayat:"44",juz:"24",desc:"Nama bacaan ini adalah Tas-hil. Tas-hil berarti meringankan atau memudahkan bacaan hamzah yang kedua, yaitu membaca hamzah kedua di antara hamzah dan alif.",arabic:'<span class="highlight">ءَاَعْجَمِيٌّ</span>',audio:"09.Aa'jamiyyun.mp3",keywords:["a'jamiyyun","tas-hil","tashil","fussilat"]},
+{id:10,title:"Am Lahum Syirkun fis-Samawati",surat:"Surah Al-Ahqaf",ayat:"4",juz:"26",desc:"Materi ini membahas kaidah Mad Badal pada contoh إِيتُونِي dan variasi penulisan hamzah awal.<br><br>1. Terdapat bentuk tulisan dengan hamzah pertama berkasrah dan bentuk tanpa kasrah. Keduanya dibaca sama, yaitu إِيتُونِي. Kaidah ini disebut Mad Badal.<br><br>2. Cara membaca waqaf pada lafaz فِي السَّمَاوَاتِ ۚ إِيتُونِي berbeda dengan washal. Ketika washal, bentuk bacaan menjadi فِي السَّمَاوَاتِ ائْتُونِي, dengan perubahan cara membaca ya' sukun menjadi hamzah sukun sebagaimana diterangkan dalam materi.",arabic:'أَمْ لَهُمْ شِرْكٌ فِي السَّمَاوَاتِ<br><span class="highlight">فِي السَّمَاوَاتِ ۚ إِيتُونِي</span><br><span class="highlight">فِي السَّمَاوَاتِ ائْتُونِي</span>',audio:"10.am lahum syirkun fis-samâwâti.mp3",keywords:["am lahum","syirkun","samawati","samâwâti","ituni","mad badal","ahqaf"]},
+{id:11,title:"Bi Salismu Fusuqu Ba'dal Iman",surat:"Surah Al-Hujurat",ayat:"11",juz:"26",desc:"Nama bacaan ini adalah Naql. Pada bentuk tulisan tertentu, alif setelah lam tidak dibaca sebagaimana tulisan biasa, sehingga harakat dipindahkan dan bacaan menjadi l-ismu.",arabic:'<span class="highlight">بِئْسَ الِاسْمُ فُسُوقٌ بَعْدَ الْإِيمَانِ</span>',audio:"11.bi salismu fusuqu ba dal iman.mp3",keywords:["naql","bi salismu","ismu","fusuqu","ba'dal iman","hujurat"]},
+{id:12,title:"Salasila wa Aghlala wa Sa'ira",surat:"Surah Ad-Dahr atau Al-Insan",ayat:"4",juz:"29",desc:"Pada lafaz سَلَاسِلَا, jika dibaca washal, bunyi LAA dibaca pendek. Jika terpaksa berhenti atau waqaf, lafaz dapat dibaca panjang atau dengan sukun sebagaimana ketentuan materi.",arabic:'<span class="highlight">سَلَاسِلَا وَأَغْلَالًا وَسَعِيرًا</span>',audio:"12.salâsilâ wa aghlâlâw wa sa'îrâ.mp3",keywords:["salasila","aghlala","sa'ira","insan","dahr","washal","waqaf"]},
+{id:13,title:"Qawarira",surat:"Surah Ad-Dahr atau Al-Insan",ayat:"15–16",juz:"29",desc:"Materi ini membahas perbedaan cara membaca lafaz Qawarira pada Surah Al-Insan ayat 15–16.<br><br>1. Pada akhir ayat 15, jika waqaf, RAA tetap dibaca panjang. Pada awal ayat 16, RAA dibaca pendek.<br>2. Jika ayat 15–16 dibaca washal, kedua RAA dibaca pendek.<br>3. Jika ayat 15–16 dibaca washal tetapi terpaksa berhenti pada lafaz Qawarira ayat 16, RAA pertama dibaca pendek dan RAA kedua dibaca sukun. Setelah itu, bacaan diulang dari Qawarira kedua dan RAA dibaca pendek.",arabic:'<span class="highlight">قَوَارِيرَا</span><br><span class="highlight">قَوَارِيرَا</span>',audio:"13.qawârîrâ.mp3",keywords:["qawarira","qawarira 1","qawarira 2","insan","dahr","waqaf","washal"]}
     ];
 
-        const QUIZ_QUESTIONS = [
+    const QUIZ_QUESTIONS = [
     {
         "id": 1,
         "question": "Pada lafaz أَلَّا تَعْدِلُوا ۚ اعْدِلُوا (QS. Al-Ma'idah: 8), bagaimana cara membacanya jika dibaca secara bersambung (washal)?",
@@ -562,12 +484,12 @@
     },
     {
         "id": 5,
-        "question": "Apabila lafaz يَلْهَثْ ذَٰلِكَ pada Surat Al-A'raf ayat 176 dibaca secara washal, maka dibaca يَلْهَذّٰلِكَ. Nama bacaan ini adalah...",
+        "question": "Pada lafaz سَلَاسِلَا, bagaimana bunyi LAA dibaca jika bacaan diteruskan secara washal?",
         "options": {
-            "A": "Idgham Mutamatsilain",
-            "B": "Idgham Bighunnah",
-            "C": "Idgham Mutajanisain",
-            "D": "Iqlab"
+            "A": "LAA dibaca panjang",
+            "B": "LAA dibaca mendengung",
+            "C": "LAA dibaca pendek",
+            "D": "LAA dibaca sukun"
         },
         "correctAnswer": "C",
         "explanation": "ثْ bertemu ذ saat washal sehingga terjadi penggabungan dua huruf berbeda yang sama makhraj, yaitu Idgham Mutajanisain.",
@@ -1482,7 +1404,7 @@
         return `
         <div class="audio-player" data-src="${src}">
             <div class="audio-controls">
-                <button class="play-btn" onclick="toggleAudio('${src}', this.closest('.audio-player'))"><i class="ph-fill ph-play"></i></button>
+                <button class="play-btn" onclick="toggleAudio(this.closest('.audio-player').dataset.src, this.closest('.audio-player'))"><i class="ph-fill ph-play"></i></button>
                 <div class="track-info">
                     <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${title}</div>
                     <div class="time-display">
@@ -1537,7 +1459,7 @@
             addXP(5); // Scan activity XP
 
             boxContainer.innerHTML = `
-                <div class="detection-highlight" style="top: 42%; left: 28%; width: 150px; height: 48px;" onclick="openPopupSheetForMaterial(1)">
+                <div class="detection-highlight" style="top: 42%; left: 28%; width: 150px; height: 48px;" onclick="openPopupSheetForMaterial(3)">
                     <span style="font-size:10px; color:white; font-weight:bold; background:var(--primary); padding:2px 4px; border-radius:3px;">Imalah (94%)</span>
                 </div>
             `;
@@ -1746,7 +1668,9 @@
         let html = '';
         const p = AppState.progress;
         let filtered = MATERIALS.filter(m => {
-            const matchesSearch = m.title.toLowerCase().includes(searchQuery.toLowerCase()) || m.surat.toLowerCase().includes(searchQuery.toLowerCase());
+            const query = searchQuery.toLowerCase().trim();
+            const searchable = [m.title, m.surat, m.ayat, m.juz, m.desc, m.arabic.replace(/<[^>]*>/g, ' '), ...(m.keywords || [])].join(' ').toLowerCase();
+            const matchesSearch = !query || searchable.includes(query);
             if(!matchesSearch) return false;
             const isDone = p.completed.includes(m.id);
             const isProg = p.inProgress.includes(m.id);
